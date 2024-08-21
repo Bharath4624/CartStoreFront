@@ -20,7 +20,9 @@ public class EditCart extends HttpServlet {
             int prod_id = jsonObject.get("id").getAsInt();
             String cart_id = CartId.getCartId(req);
             CartItems item = getProductDetails(prod_id, cart_id);
-            add(item);
+            if(item!=null) {
+                add(item);
+            }
             updateCart(cart_id);
             JsonObject response = new JsonObject();
             response.addProperty("cart_id", cart_id);
@@ -54,7 +56,9 @@ public class EditCart extends HttpServlet {
             int prod_id = jsonObject.get("id").getAsInt();
             String cart_id = CartId.getCartId(req);
             CartItems item = getProductDetails(prod_id, cart_id);
-            delete(item);
+            if(item!=null) {
+                delete(item);
+            }
             updateCart(cart_id);
             JsonObject response = new JsonObject();
             response.addProperty("cart_id", cart_id);
