@@ -27,7 +27,8 @@ public class AddToCart extends HttpServlet {
                 CartItems item = getProductDetails(prod_id, cart_id);
                 if (item != null) {
                     response.addProperty("status", "success");
-                    addToCart(item);
+                    addToCartItems(item);
+                    updateCart(cart_id);
                 } else {
                     response.addProperty("status", "failed,product does not exist");
                     return;
@@ -85,7 +86,7 @@ public class AddToCart extends HttpServlet {
         return item;
     }
 
-    public void addToCart(CartItems item) throws SQLException, ClassNotFoundException {
+    public void addToCartItems(CartItems item) throws SQLException, ClassNotFoundException {
         Connection con = DatabaseConnection.getConnection();
         PreparedStatement stmt = con.prepareStatement("SELECT * FROM cart_items WHERE cart_id=? AND prod_id=?");
         stmt.setString(1, item.getCart_id());
@@ -107,6 +108,19 @@ public class AddToCart extends HttpServlet {
             stmt.setInt(3, item.getQuantity());
             stmt.setDouble(4, item.getSubtotal());
             stmt.setString(5, item.getCart_id());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void updateCart(String cart_id) throws SQLException, ClassNotFoundException {
+        Connection con = DatabaseConnection.getConnection();
+        PreparedStatement stmt = con.prepareStatement("SELECT SUM(subtotal) FROM cart_items WHERE cart_id=?");
+        stmt.setString(1, cart_id);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            stmt = con.prepareStatement("UPDATE cart SET subtotal=? WHERE cart_id=?");
+            stmt.setDouble(1, rs.getDouble(1));
+            stmt.setString(2, cart_id);
             stmt.executeUpdate();
         }
     }
