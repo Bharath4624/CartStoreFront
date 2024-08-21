@@ -98,5 +98,4 @@ public class PlaceOrder extends HttpServlet {
             stmt.executeUpdate();
         }
     }
-
 }
