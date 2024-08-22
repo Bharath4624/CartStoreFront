@@ -8,17 +8,17 @@ public class DatabaseConnection {
         return DriverManager.getConnection("jdbc:mysql://localhost:3306/order", "root", "bharath123@#");
     }
 }
-class DbOperation{
+
+class DbOperation {
     public static ResultSet executeQuery(String query, Object[] par) throws SQLException, ClassNotFoundException {
-        Connection con=DatabaseConnection.getConnection();
-        PreparedStatement stmt=con.prepareStatement(query);
-        for(int i=0;i<par.length;i++){
-            stmt.setObject(i+1,par[i]);
+        Connection con = DatabaseConnection.getConnection();
+        PreparedStatement stmt = con.prepareStatement(query);
+        for (int i = 0; i < par.length; i++) {
+            stmt.setObject(i + 1, par[i]);
         }
-        if(query.trim().toUpperCase().startsWith("SELECT")){
+        if (query.trim().toUpperCase().startsWith("SELECT")) {
             return stmt.executeQuery();
-        }
-        else{
+        } else {
             stmt.executeUpdate();
             return null;
         }
