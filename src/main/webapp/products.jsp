@@ -28,7 +28,6 @@ Connection con=null;
             });
             const data = await response.json();
             if (data.status==="success") {
-                addToUrl(data.cart_id);
                 showPopup("Item added to cart");
             }
             else {
@@ -50,12 +49,6 @@ Connection con=null;
             popup.style.opacity = 0;
             setTimeout(()=>document.body.removeChild(popup),500);
         },200);
-    }
-    function addToUrl(data){
-            let inputUrl = new URL(window.location.href);
-            let inputParams = new URLSearchParams(inputUrl.search);
-            inputParams.set('cart_id', data);
-            window.history.replaceState(null,'',inputUrl.pathname+'?'+inputParams.toString());
     }
     </script>
     <style>
