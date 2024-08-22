@@ -12,7 +12,7 @@ import java.io.*;
 public class ShippingDetails extends HttpServlet {
     public Gson gson = new Gson();
     public Map<String, Double> charges = new HashMap<>();
-
+    public static Cart cart=AddCustomer.cart;
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
         PrintWriter out = res.getWriter();
@@ -29,6 +29,7 @@ public class ShippingDetails extends HttpServlet {
             response.addProperty("shipping_method", shipping_method);
             response.addProperty("shipping_charge", shipping_charge);
             response.addProperty("totalamount", totals[0]);
+            System.out.println(cart.getCart_id()+" "+cart.getCus_id()+" "+cart.getShipping_method()+" "+cart.getShipping_charge()+" "+cart.getPayment_mode()+" "+cart.getService_charge()+" "+cart.getSubtotal()+" "+cart.getTotaltax()+" "+cart.getTotalamount());
             out.println(response);
             out.flush();
         } catch (Exception e) {
@@ -61,6 +62,11 @@ public class ShippingDetails extends HttpServlet {
 
     public void updateCart(String shipping_method, double shipping_charge, double[] totals, String cart_id) throws SQLException, ClassNotFoundException {
         String query = "UPDATE cart SET totaltax=?,subtotal=?,totalamount=?,shipping_charge=?,shipping_method=? WHERE cart_id=?";
+        cart.setShipping_method(shipping_method);
+        cart.setShipping_charge(shipping_charge);
+        cart.setTotaltax(totals[2]);
+        cart.setTotalamount(totals[0]);
+        cart.setSubtotal(totals[1]);
         Object[] par = {totals[2], totals[1], totals[0], shipping_charge, shipping_method, cart_id};
         Cart.persist(query, par);
     }

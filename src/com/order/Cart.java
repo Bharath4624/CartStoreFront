@@ -110,4 +110,34 @@ public class Cart {
             return null;
         }
     }
+
+    public static void executeQuery(Cart cart,String query) throws SQLException, ClassNotFoundException {
+        Connection con=DatabaseConnection.getConnection();
+        if(query.equalsIgnoreCase("update")){
+            PreparedStatement stmt=con.prepareStatement("UPDATE cart SET cus_id=?,totaltax=?,shipping_method=?,shipping_charge=?,payment_mode=?,service_charge=?,totalamount=?,subtotal=? WHERE cart_id=?");
+            stmt.setObject(1,cart.getCus_id());
+            stmt.setObject(2,cart.getTotaltax());
+            stmt.setObject(3,cart.getShipping_method());
+            stmt.setObject(4,cart.getShipping_charge());
+            stmt.setObject(5,cart.getPayment_mode());
+            stmt.setObject(6,cart.getService_charge());
+            stmt.setObject(7,cart.getTotalamount());
+            stmt.setObject(8,cart.getSubtotal());
+            stmt.setObject(9,cart.getCart_id());
+            stmt.executeUpdate();
+        }
+        else{
+            PreparedStatement stmt=con.prepareStatement("INSERT INTO cart VALUES (?,?,?,?,?,?,?,?,?)");
+            stmt.setObject(1,cart.getCart_id());
+            stmt.setObject(2,cart.getCus_id());
+            stmt.setObject(3,cart.getTotaltax());
+            stmt.setObject(4,cart.getShipping_method());
+            stmt.setObject(5,cart.getShipping_charge());
+            stmt.setObject(6,cart.getPayment_mode());
+            stmt.setObject(7,cart.getService_charge());
+            stmt.setObject(8,cart.getTotalamount());
+            stmt.setObject(9,cart.getSubtotal());
+            stmt.executeUpdate();
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.order;
 
 import java.sql.*;
+import java.util.*;
 
 public class CartItems {
     public int prod_id;
@@ -68,6 +69,28 @@ public class CartItems {
         } else {
             stmt.executeUpdate();
             return null;
+        }
+    }
+
+    public static void executeQuery(CartItems i, String query) throws SQLException, ClassNotFoundException {
+        Connection con = DatabaseConnection.getConnection();
+        if (query.equalsIgnoreCase("insert")) {
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO cart_items(prod_id,name,quantity,subtotal,cart_id) VALUES(?,?,?,?,?)");
+            stmt.setObject(1, i.getProd_id());
+            stmt.setObject(2, i.getName());
+            stmt.setObject(3, i.getQuantity());
+            stmt.setObject(4, i.getSubtotal());
+            stmt.setObject(5, i.getCart_id());
+            stmt.executeUpdate();
+        } else if (query.equalsIgnoreCase("update")) {
+            PreparedStatement stmt = con.prepareStatement("UPDATE cart_items SET prod_id=?,name=?,quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?");
+            stmt.setObject(1, i.getProd_id());
+            stmt.setObject(2, i.getName());
+            stmt.setObject(3, i.getQuantity());
+            stmt.setObject(4, i.getSubtotal());
+            stmt.setObject(5, i.getCart_id());
+            stmt.setObject(6,i.getProd_id());
+            stmt.executeUpdate();
         }
     }
 }

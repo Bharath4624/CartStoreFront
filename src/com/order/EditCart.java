@@ -10,7 +10,7 @@ import java.sql.*;
 @WebServlet("/cart/edit")
 public class EditCart extends HttpServlet {
     public Gson gson = new Gson();
-
+    public static Cart cart=AddToCart.cart;
     public void doPut(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
         PrintWriter out = res.getWriter();
@@ -27,6 +27,7 @@ public class EditCart extends HttpServlet {
             JsonObject response = new JsonObject();
             response.addProperty("cart_id", cart_id);
             response.addProperty("status", "success");
+            System.out.println(cart.getCart_id()+" "+cart.getSubtotal()+" "+cart.getTotaltax()+" "+cart.getTotalamount());
             out.print(response);
             out.flush();
         } catch (Exception e) {
@@ -38,9 +39,7 @@ public class EditCart extends HttpServlet {
         double price = item.getSubtotal() / item.getQuantity();
         item.setQuantity(item.getQuantity() + 1);
         item.setSubtotal(item.getQuantity() * price);
-        String query = "UPDATE cart_items SET quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?";
-        Object[] par = {item.getQuantity(), item.getSubtotal(), item.getCart_id(), item.getProd_id()};
-        CartItems.persist(query, par);
+        CartItems.executeQuery(item,"update");
     }
 
     public void doDelete(HttpServletRequest req, HttpServletResponse res) throws IOException {
@@ -59,6 +58,7 @@ public class EditCart extends HttpServlet {
             JsonObject response = new JsonObject();
             response.addProperty("cart_id", cart_id);
             response.addProperty("status", "success");
+            System.out.println(cart.getCart_id()+" "+cart.getCus_id()+" "+cart.getShipping_method()+" "+cart.getShipping_charge()+" "+cart.getPayment_mode()+" "+cart.getService_charge()+" "+cart.getSubtotal()+" "+cart.getTotaltax()+" "+cart.getTotalamount());
             out.print(response);
             out.flush();
         } catch (Exception e) {
@@ -75,9 +75,7 @@ public class EditCart extends HttpServlet {
             CartItems.persist(query, par);
         } else {
             item.setSubtotal(item.getQuantity() * price);
-            String query = "UPDATE cart_items SET quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?";
-            Object[] par = {item.getQuantity(), item.getSubtotal(), item.getCart_id(), item.getProd_id()};
-            CartItems.persist(query, par);
+            CartItems.executeQuery(item,"update");
         }
     }
 
@@ -103,6 +101,9 @@ public class EditCart extends HttpServlet {
             double totaltax = (rs.getDouble(1) * 12) / 100;
             double totalamount = subtotal + totaltax + result.getDouble("shipping_charge") + result.getDouble("service_charge");
             String query2 = "UPDATE cart SET subtotal=?,totaltax=?,totalamount=? WHERE cart_id=?";
+            cart.setSubtotal(subtotal);
+            cart.setTotaltax(totaltax);
+            cart.setTotalamount(totalamount);
             Object[] par2 = {subtotal, totaltax, totalamount, cart_id};
             Cart.persist(query2, par2);
         }

@@ -11,7 +11,7 @@ import java.util.*;
 @WebServlet("/cart")
 public class AddToCart extends HttpServlet {
     public Gson gson = new Gson();
-    public List<CartItems> list=new ArrayList<>();
+    public static Cart cart=new Cart("NULL",0,0.0,"NULL",0.0,"NULL",0.0,0.0,0.0);
     public void doPut(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
         PrintWriter out = res.getWriter();
@@ -20,6 +20,7 @@ public class AddToCart extends HttpServlet {
             JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
             int prod_id;
             String cart_id = generateCartId(req, res);
+            cart.setCart_id(cart_id);
             insertCartId(cart_id);
             JsonObject response = new JsonObject();
             if (jsonObject.get("prod_id") != null) {
@@ -27,8 +28,9 @@ public class AddToCart extends HttpServlet {
                 CartItems item = getProductDetails(prod_id, cart_id);
                 if (item != null) {
                     response.addProperty("status", "success");
-                    addToCartItems(item);
+                    addToCartItems(item,getCartItems(cart_id,prod_id));
                     updateCart(cart_id);
+                    System.out.println(cart.getCart_id()+" "+cart.getCus_id()+" "+cart.getShipping_method()+" "+cart.getShipping_charge()+" "+cart.getPayment_mode()+" "+cart.getService_charge()+" "+cart.getSubtotal()+" "+cart.getTotaltax()+" "+cart.getTotalamount());
                 } else {
                     response.addProperty("status", "failed,product does not exist");
                     return;
@@ -83,20 +85,24 @@ public class AddToCart extends HttpServlet {
         return item;
     }
 
-    public void addToCartItems(CartItems item) throws SQLException, ClassNotFoundException {
-        String query = "SELECT * FROM cart_items WHERE cart_id=? AND prod_id=?";
-        Object[] par = {item.getCart_id(), item.getProd_id()};
-        ResultSet rs = CartItems.persist(query, par);
-        if (rs.next()) {
-            item.setQuantity(rs.getInt("quantity") + 1);
-            item.setSubtotal(item.getSubtotal() * item.getQuantity());
-            String query1 = "UPDATE cart_items SET quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?";
-            Object[] par1 = {item.getQuantity(), item.getSubtotal(), item.getCart_id(), item.getProd_id()};
-            CartItems.persist(query1, par1);
-        } else {
-            String query2 = "INSERT INTO cart_items(prod_id,name,quantity,subtotal,cart_id) VALUES (?,?,?,?,?)";
-            Object[] par2 = {item.getProd_id(), item.getName(), item.getQuantity(), item.getSubtotal(), item.getCart_id()};
-            CartItems.persist(query2, par2);
+    public CartItems getCartItems(String cart_id,int prod_id) throws SQLException, ClassNotFoundException {
+        String query="SELECT * FROM cart_items WHERE cart_id=? AND prod_id=?";
+        Object[] par={cart_id,prod_id};
+        ResultSet rs=CartItems.persist(query,par);
+        if(rs.next()){
+            return new CartItems(rs.getInt("prod_id"), rs.getString("name"), rs.getInt("quantity"), rs.getDouble("subtotal"), rs.getString("cart_id"));
+        }
+        return null;
+    }
+
+    public void addToCartItems(CartItems item,CartItems cartitem) throws SQLException, ClassNotFoundException {
+        if(cartitem==null){
+            CartItems.executeQuery(item,"insert");
+        }
+        else{
+            cartitem.setQuantity(cartitem.getQuantity()+1);
+            cartitem.setSubtotal(cartitem.getQuantity()*item.getSubtotal());
+            CartItems.executeQuery(cartitem,"update");
         }
     }
 
@@ -107,6 +113,7 @@ public class AddToCart extends HttpServlet {
         if (rs.next()) {
             String query1 = "UPDATE cart SET subtotal=? WHERE cart_id=?";
             Object[] par1 = {rs.getDouble(1), cart_id};
+            cart.setSubtotal(rs.getDouble(1));
             Cart.persist(query1, par1);
         }
     }
