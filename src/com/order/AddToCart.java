@@ -11,7 +11,7 @@ import java.util.*;
 @WebServlet("/cart")
 public class AddToCart extends HttpServlet {
     public Gson gson = new Gson();
-
+    public List<CartItems> list=new ArrayList<>();
     public void doPut(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
         PrintWriter out = res.getWriter();
@@ -68,8 +68,7 @@ public class AddToCart extends HttpServlet {
         ResultSet rs = Cart.persist(query, par);
         if (!rs.next()) {
             String query1 = "INSERT INTO cart(cart_id)VALUES(?)";
-            Object[] par1 = {cart_id};
-            Cart.persist(query1, par1);
+            Cart.persist(query1, par);
         }
     }
 
