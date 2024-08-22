@@ -74,10 +74,6 @@ function goNext(){
             if(rs.next()) {
         %>
         <tr>
-        <td>Customer_Id</td>
-        <td><%=rs.getInt("cus_id")%></td>
-        </tr>
-        <tr>
         <td>Shipping_method</td>
         <td><%=rs.getString("shipping_method")%></td>
         </tr>
@@ -113,7 +109,6 @@ function goNext(){
     <h4>Product details</h4>
     <table border="1px" width="100%">
     <tr>
-        <td>Product_Id</td>
         <td>Name</td>
         <td>Quantity</td>
         <td>Subtotal</td>
@@ -125,7 +120,6 @@ function goNext(){
                 while(result.next()) {
             %>
             <tr>
-            <td><%=result.getInt("prod_id")%></td>
             <td><%=result.getString("name")%></td>
             <td><%=result.getInt("quantity")%></td>
             <td><%=result.getDouble("subtotal")%></td>
@@ -138,7 +132,6 @@ function goNext(){
         <h4>Customer details</h4>
         <table border="1px" width="100%">
         <tr>
-           <th>Customer_ID</th>
            <th>Customer_Name</th>
            <th>Address</th>
            <th>Country</th>
@@ -152,7 +145,6 @@ function goNext(){
            if(result.next()) {
         %>
         <tr>
-           <td><%= result.getInt("cus_id") %></td>
            <td><%= result.getString("name") %></td>
            <td><%= result.getString("address") %>,<%= result.getString("city") %>-<%= result.getString("zipcode") %></td>
            <td><%= result.getString("country") %></td>

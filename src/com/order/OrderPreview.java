@@ -47,7 +47,6 @@ public class OrderPreview extends HttpServlet {
         Object[] par = {cart_id};
         ResultSet rs = Cart.persist(query, par);
         if (rs.next()) {
-            response.addProperty("cus_id", rs.getInt("cus_id"));
             response.addProperty("shipping method", rs.getString("shipping_method"));
             response.addProperty("shipping_charge", rs.getDouble("shipping_charge"));
             response.addProperty("payment_mode", rs.getString("payment_mode"));
@@ -69,7 +68,6 @@ public class OrderPreview extends HttpServlet {
             Object[] par1 = {rs.getInt("cus_id")};
             ResultSet result = Customer.persist(query1, par1);
             if (result.next()) {
-                response.addProperty("id", result.getInt("cus_id"));
                 response.addProperty("name", result.getString("name"));
                 response.addProperty("address", result.getString("address") + "," + result.getString("city") + "-" + result.getString("zipcode"));
                 response.addProperty("country", result.getString("country"));
