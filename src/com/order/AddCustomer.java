@@ -45,12 +45,12 @@ public class AddCustomer extends HttpServlet {
     public int insertCustomer(Customer customer) throws SQLException, ClassNotFoundException {
         String query = "SELECT * FROM customers WHERE name=? AND address=? AND city=? AND zipcode=? AND country=? AND mobile=? AND email=?";
         Object[] par = {customer.getName(), customer.getAddress(), customer.getCity(), customer.getZipcode(), customer.getCountry(), customer.getMobile(), customer.getEmail()};
-        ResultSet rs = DbOperation.executeQuery(query, par);
+        ResultSet rs = Customer.persist(query, par);
         if (!rs.next()) {
             String query1 = "INSERT INTO customers(name,address,city,zipcode,country,mobile,email)VALUES(?,?,?,?,?,?,?)";
-            DbOperation.executeQuery(query1, par);
+            Customer.persist(query1, par);
             String query2 = "SELECT cus_id FROM customers ORDER BY cus_id DESC LIMIT 1";
-            ResultSet generatedKeys = DbOperation.executeQuery(query2, new Object[]{});
+            ResultSet generatedKeys = Customer.persist(query2, new Object[]{});
             if (generatedKeys.next()) {
                 return generatedKeys.getInt(1);
             } else {
@@ -63,7 +63,7 @@ public class AddCustomer extends HttpServlet {
     public double[] calculateTotal(String cart_id) throws SQLException, ClassNotFoundException {
         String query = "SELECT SUM(subtotal) FROM cart_items WHERE cart_id=?";
         Object[] par = {cart_id};
-        ResultSet rs = DbOperation.executeQuery(query, par);
+        ResultSet rs = CartItems.persist(query, par);
         if (rs.next()) {
             double subtotal = rs.getDouble(1);
             double totaltax = (subtotal * 12) / 100;
@@ -76,6 +76,6 @@ public class AddCustomer extends HttpServlet {
     public void updateCart(int cus_id, String cart_id, double[] totals) throws SQLException, ClassNotFoundException {
         String query = "UPDATE cart SET subtotal=?,totalamount=?,cus_id=?,totaltax=? WHERE cart_id=?";
         Object[] par = {totals[2], totals[1], cus_id, totals[0], cart_id};
-        DbOperation.executeQuery(query, par);
+        Cart.persist(query, par);
     }
 }

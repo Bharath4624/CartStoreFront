@@ -40,7 +40,7 @@ public class EditCart extends HttpServlet {
         item.setSubtotal(item.getQuantity() * price);
         String query = "UPDATE cart_items SET quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?";
         Object[] par = {item.getQuantity(), item.getSubtotal(), item.getCart_id(), item.getProd_id()};
-        DbOperation.executeQuery(query, par);
+        CartItems.persist(query, par);
     }
 
     public void doDelete(HttpServletRequest req, HttpServletResponse res) throws IOException {
@@ -72,12 +72,12 @@ public class EditCart extends HttpServlet {
         if (item.getQuantity() <= 0) {
             String query = "DELETE FROM cart_items WHERE prod_id=? AND cart_id=?";
             Object[] par = {item.getProd_id(), item.getCart_id()};
-            DbOperation.executeQuery(query, par);
+            CartItems.persist(query, par);
         } else {
             item.setSubtotal(item.getQuantity() * price);
             String query = "UPDATE cart_items SET quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?";
             Object[] par = {item.getQuantity(), item.getSubtotal(), item.getCart_id(), item.getProd_id()};
-            DbOperation.executeQuery(query, par);
+            CartItems.persist(query, par);
         }
     }
 
@@ -85,7 +85,7 @@ public class EditCart extends HttpServlet {
         CartItems item = null;
         String query = "SELECT * FROM cart_items WHERE prod_id=? AND cart_id=?";
         Object[] par = {prod_id, cart_id};
-        ResultSet rs = DbOperation.executeQuery(query, par);
+        ResultSet rs = CartItems.persist(query, par);
         if (rs.next()) {
             item = new CartItems(rs.getInt("prod_id"), rs.getString("name"), rs.getInt("quantity"), rs.getDouble("subtotal"), rs.getString("cart_id"));
         }
@@ -96,15 +96,15 @@ public class EditCart extends HttpServlet {
         String query = "SELECT SUM(subtotal) FROM cart_items WHERE cart_id=?";
         String query1 = "SELECT * FROM cart WHERE cart_id=?";
         Object[] par = {cart_id};
-        ResultSet rs = DbOperation.executeQuery(query, par);
-        ResultSet result = DbOperation.executeQuery(query1, par);
+        ResultSet rs = CartItems.persist(query, par);
+        ResultSet result = Cart.persist(query1, par);
         if (rs.next() && result.next()) {
             double subtotal = rs.getDouble(1);
             double totaltax = (rs.getDouble(1) * 12) / 100;
             double totalamount = subtotal + totaltax + result.getDouble("shipping_charge") + result.getDouble("service_charge");
             String query2 = "UPDATE cart SET subtotal=?,totaltax=?,totalamount=? WHERE cart_id=?";
             Object[] par2 = {subtotal, totaltax, totalamount, cart_id};
-            DbOperation.executeQuery(query2, par2);
+            Cart.persist(query2, par2);
         }
     }
 }

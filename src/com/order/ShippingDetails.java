@@ -49,7 +49,7 @@ public class ShippingDetails extends HttpServlet {
     public double[] calculateTotals(String cart_id, double shipping_charge) throws SQLException, ClassNotFoundException {
         String query = "SELECT SUM(cart_items.subtotal),cart.totaltax,cart.service_charge FROM cart INNER JOIN cart_items ON cart_items.cart_id=cart.cart_id WHERE cart.cart_id=?";
         Object[] par = {cart_id};
-        ResultSet rs = DbOperation.executeQuery(query, par);
+        ResultSet rs = Cart.persist(query, par);
         if (rs.next()) {
             double totalamount = rs.getDouble(1) + rs.getDouble(2) + rs.getDouble(3);
             double totaltax = (rs.getDouble(1) * 12) / 100;
@@ -62,6 +62,6 @@ public class ShippingDetails extends HttpServlet {
     public void updateCart(String shipping_method, double shipping_charge, double[] totals, String cart_id) throws SQLException, ClassNotFoundException {
         String query = "UPDATE cart SET totaltax=?,subtotal=?,totalamount=?,shipping_charge=?,shipping_method=? WHERE cart_id=?";
         Object[] par = {totals[2], totals[1], totals[0], shipping_charge, shipping_method, cart_id};
-        DbOperation.executeQuery(query, par);
+        Cart.persist(query, par);
     }
 }

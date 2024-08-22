@@ -1,5 +1,7 @@
 package com.order;
 
+import java.sql.*;
+
 public class Customer {
     public String name;
     public String address;
@@ -73,5 +75,19 @@ public class Customer {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public static ResultSet persist(String query, Object[] par) throws SQLException, ClassNotFoundException {
+        Connection con = DatabaseConnection.getConnection();
+        PreparedStatement stmt = con.prepareStatement(query);
+        for (int i = 0; i < par.length; i++) {
+            stmt.setObject(i + 1, par[i]);
+        }
+        if (query.trim().toUpperCase().startsWith("SELECT")) {
+            return stmt.executeQuery();
+        } else {
+            stmt.executeUpdate();
+            return null;
+        }
     }
 }

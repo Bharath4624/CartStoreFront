@@ -16,7 +16,7 @@ public class UpdatedCart extends HttpServlet {
             String cart_id = CartId.getCartId(req);
             String query = "SELECT * FROM cart_items WHERE cart_id=?";
             Object[] par = {cart_id};
-            ResultSet rs = DbOperation.executeQuery(query, par);
+            ResultSet rs = CartItems.persist(query, par);
             JsonArray itemsArray = new JsonArray();
             while (rs.next()) {
                 JsonObject item = new JsonObject();
