@@ -16,8 +16,7 @@ class DbOperation{
             stmt.setObject(i+1,par[i]);
         }
         if(query.trim().toUpperCase().startsWith("SELECT")){
-            ResultSet rs=stmt.executeQuery();
-            return rs;
+            return stmt.executeQuery();
         }
         else{
             stmt.executeUpdate();
