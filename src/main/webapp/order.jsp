@@ -55,6 +55,10 @@ Connection con=null;
         <td><%=rs.getDouble("service_charge")%></td>
         </tr>
         <tr>
+        <td>Subtotal</td>
+        <td><%=rs.getDouble("subtotal")%></td>
+        </tr>
+        <tr>
         <td>Total_tax</td>
         <td><%=rs.getDouble("totaltax")%></td>
         </tr>
