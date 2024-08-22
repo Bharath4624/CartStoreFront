@@ -47,10 +47,9 @@ public class PaymentDetails extends HttpServlet {
     }
 
     public double[] calculateTotals(String cart_id, double service_charge) throws SQLException, ClassNotFoundException {
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("SELECT SUM(cart_items.subtotal),cart.shipping_charge FROM cart INNER JOIN cart_items ON cart_items.cart_id=cart.cart_id WHERE cart.cart_id=?");
-        stmt.setString(1, cart_id);
-        ResultSet rs = stmt.executeQuery();
+        String query = "SELECT SUM(cart_items.subtotal),cart.shipping_charge FROM cart INNER JOIN cart_items ON cart_items.cart_id=cart.cart_id WHERE cart.cart_id=?";
+        Object[] par = {cart_id};
+        ResultSet rs = DbOperation.executeQuery(query, par);
         if (rs.next()) {
             double subtotal = rs.getDouble(1);
             double shipping_charge = rs.getDouble(2);
@@ -62,14 +61,8 @@ public class PaymentDetails extends HttpServlet {
     }
 
     public void updateCart(double[] totals, double service_charge, String payment_mode, String cart_id) throws SQLException, ClassNotFoundException {
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("UPDATE cart SET totaltax=?,subtotal=?,totalamount=?,payment_mode=?,service_charge=? WHERE cart_id=?");
-        stmt.setDouble(1, totals[2]);
-        stmt.setDouble(2, totals[1]);
-        stmt.setDouble(3, totals[0]);
-        stmt.setString(4, payment_mode);
-        stmt.setDouble(5, service_charge);
-        stmt.setString(6, cart_id);
-        stmt.executeUpdate();
+        String query = "UPDATE cart SET totaltax=?,subtotal=?,totalamount=?,payment_mode=?,service_charge=? WHERE cart_id=?";
+        Object[] par = {totals[2], totals[1], totals[0], payment_mode, service_charge, cart_id};
+        DbOperation.executeQuery(query, par);
     }
 }

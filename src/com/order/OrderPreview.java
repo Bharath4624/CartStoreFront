@@ -13,13 +13,12 @@ public class OrderPreview extends HttpServlet {
         res.setContentType("application/json");
         PrintWriter out = res.getWriter();
         try {
-            Connection con = DatabaseConnection.getConnection();
             String cart_id = CartId.getCartId(req);
             JsonObject response = new JsonObject();
             response.addProperty("cart_id", cart_id);
-            response.add("items", getCartItems(con, cart_id));
-            response.add("billing_details", getSummary(con, cart_id));
-            response.add("customer", getCustomer(con, cart_id));
+            response.add("items", getCartItems(cart_id));
+            response.add("billing_details", getSummary(cart_id));
+            response.add("customer", getCustomer(cart_id));
             out.print(response);
             out.flush();
         } catch (Exception e) {
@@ -27,10 +26,10 @@ public class OrderPreview extends HttpServlet {
         }
     }
 
-    public JsonArray getCartItems(Connection con, String cart_id) throws SQLException {
-        PreparedStatement stmt = con.prepareStatement("SELECT * FROM cart_items WHERE cart_id=?");
-        stmt.setString(1, cart_id);
-        ResultSet rs = stmt.executeQuery();
+    public JsonArray getCartItems(String cart_id) throws SQLException, ClassNotFoundException {
+        String query = "SELECT * FROM cart_items WHERE cart_id=?";
+        Object[] par = {cart_id};
+        ResultSet rs = DbOperation.executeQuery(query, par);
         JsonArray itemsArray = new JsonArray();
         while (rs.next()) {
             JsonObject item = new JsonObject();
@@ -42,11 +41,11 @@ public class OrderPreview extends HttpServlet {
         return itemsArray;
     }
 
-    public JsonObject getSummary(Connection con, String cart_id) throws SQLException {
+    public JsonObject getSummary(String cart_id) throws SQLException, ClassNotFoundException {
         JsonObject response = new JsonObject();
-        PreparedStatement stmt = con.prepareStatement("SELECT * FROM cart WHERE cart_id=?");
-        stmt.setString(1, cart_id);
-        ResultSet rs = stmt.executeQuery();
+        String query = "SELECT * FROM cart WHERE cart_id=?";
+        Object[] par = {cart_id};
+        ResultSet rs = DbOperation.executeQuery(query, par);
         if (rs.next()) {
             response.addProperty("cus_id", rs.getInt("cus_id"));
             response.addProperty("shipping method", rs.getString("shipping_method"));
@@ -60,15 +59,15 @@ public class OrderPreview extends HttpServlet {
         return response;
     }
 
-    public JsonObject getCustomer(Connection con, String cart_id) throws SQLException {
+    public JsonObject getCustomer(String cart_id) throws SQLException, ClassNotFoundException {
         JsonObject response = new JsonObject();
-        PreparedStatement stmt = con.prepareStatement("SELECT * FROM cart WHERE cart_id=?");
-        stmt.setString(1, cart_id);
-        ResultSet rs = stmt.executeQuery();
+        String query = "SELECT * FROM cart WHERE cart_id=?";
+        Object[] par = {cart_id};
+        ResultSet rs = DbOperation.executeQuery(query, par);
         if (rs.next()) {
-            stmt = con.prepareStatement("SELECT * FROM customers WHERE cus_id=?");
-            stmt.setInt(1, rs.getInt("cus_id"));
-            ResultSet result = stmt.executeQuery();
+            String query1 = "SELECT * FROM customers WHERE cus_id=?";
+            Object[] par1 = {rs.getInt("cus_id")};
+            ResultSet result = DbOperation.executeQuery(query1, par1);
             if (result.next()) {
                 response.addProperty("id", result.getInt("cus_id"));
                 response.addProperty("name", result.getString("name"));

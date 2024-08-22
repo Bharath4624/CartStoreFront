@@ -63,22 +63,20 @@ public class AddToCart extends HttpServlet {
     }
 
     public void insertCartId(String cart_id) throws SQLException, ClassNotFoundException {
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("SELECT * FROM cart WHERE cart_id=?");
-        stmt.setString(1, cart_id);
-        ResultSet rs = stmt.executeQuery();
+        String query = "SELECT * FROM cart WHERE cart_id=?";
+        Object[] par = {cart_id};
+        ResultSet rs = DbOperation.executeQuery(query, par);
         if (!rs.next()) {
-            PreparedStatement st = con.prepareStatement("INSERT INTO cart(cart_id)VALUES(?)");
-            st.setString(1, cart_id);
-            st.executeUpdate();
+            String query1 = "INSERT INTO cart(cart_id)VALUES(?)";
+            Object[] par1 = {cart_id};
+            DbOperation.executeQuery(query1, par1);
         }
     }
 
     public CartItems getProductDetails(int prod_id, String cart_id) throws SQLException, ClassNotFoundException {
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("SELECT * FROM products WHERE prod_id=?");
-        stmt.setInt(1, prod_id);
-        ResultSet rs = stmt.executeQuery();
+        String query = "SELECT * FROM products WHERE prod_id=?";
+        Object[] par = {prod_id};
+        ResultSet rs = DbOperation.executeQuery(query, par);
         CartItems item = null;
         if (rs.next()) {
             item = new CartItems(prod_id, rs.getString("name"), 1, rs.getDouble("price"), cart_id);
@@ -87,41 +85,30 @@ public class AddToCart extends HttpServlet {
     }
 
     public void addToCartItems(CartItems item) throws SQLException, ClassNotFoundException {
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("SELECT * FROM cart_items WHERE cart_id=? AND prod_id=?");
-        stmt.setString(1, item.getCart_id());
-        stmt.setInt(2, item.getProd_id());
-        ResultSet rs = stmt.executeQuery();
+        String query = "SELECT * FROM cart_items WHERE cart_id=? AND prod_id=?";
+        Object[] par = {item.getCart_id(), item.getProd_id()};
+        ResultSet rs = DbOperation.executeQuery(query, par);
         if (rs.next()) {
             item.setQuantity(rs.getInt("quantity") + 1);
             item.setSubtotal(item.getSubtotal() * item.getQuantity());
-            stmt = con.prepareStatement("UPDATE cart_items SET quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?");
-            stmt.setInt(1, item.getQuantity());
-            stmt.setDouble(2, item.getSubtotal());
-            stmt.setString(3, item.getCart_id());
-            stmt.setInt(4, item.getProd_id());
-            stmt.executeUpdate();
+            String query1 = "UPDATE cart_items SET quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?";
+            Object[] par1 = {item.getQuantity(), item.getSubtotal(), item.getCart_id(), item.getProd_id()};
+            DbOperation.executeQuery(query1, par1);
         } else {
-            stmt = con.prepareStatement("INSERT INTO cart_items(prod_id,name,quantity,subtotal,cart_id) VALUES (?,?,?,?,?)");
-            stmt.setInt(1, item.getProd_id());
-            stmt.setString(2, item.getName());
-            stmt.setInt(3, item.getQuantity());
-            stmt.setDouble(4, item.getSubtotal());
-            stmt.setString(5, item.getCart_id());
-            stmt.executeUpdate();
+            String query2 = "INSERT INTO cart_items(prod_id,name,quantity,subtotal,cart_id) VALUES (?,?,?,?,?)";
+            Object[] par2 = {item.getProd_id(), item.getName(), item.getQuantity(), item.getSubtotal(), item.getCart_id()};
+            DbOperation.executeQuery(query2, par2);
         }
     }
 
     public void updateCart(String cart_id) throws SQLException, ClassNotFoundException {
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("SELECT SUM(subtotal) FROM cart_items WHERE cart_id=?");
-        stmt.setString(1, cart_id);
-        ResultSet rs = stmt.executeQuery();
+        String query = "SELECT SUM(subtotal) FROM cart_items WHERE cart_id=?";
+        Object[] par = {cart_id};
+        ResultSet rs = DbOperation.executeQuery(query, par);
         if (rs.next()) {
-            stmt = con.prepareStatement("UPDATE cart SET subtotal=? WHERE cart_id=?");
-            stmt.setDouble(1, rs.getDouble(1));
-            stmt.setString(2, cart_id);
-            stmt.executeUpdate();
+            String query1 = "UPDATE cart SET subtotal=? WHERE cart_id=?";
+            Object[] par1 = {rs.getDouble(1), cart_id};
+            DbOperation.executeQuery(query1, par1);
         }
     }
 }

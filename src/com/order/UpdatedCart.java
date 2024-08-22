@@ -13,11 +13,10 @@ public class UpdatedCart extends HttpServlet {
         res.setContentType("application/json");
         PrintWriter out = res.getWriter();
         try {
-            Connection con = DatabaseConnection.getConnection();
             String cart_id = CartId.getCartId(req);
-            PreparedStatement stmt = con.prepareStatement("SELECT * FROM cart_items WHERE cart_id=?");
-            stmt.setString(1, cart_id);
-            ResultSet rs = stmt.executeQuery();
+            String query = "SELECT * FROM cart_items WHERE cart_id=?";
+            Object[] par = {cart_id};
+            ResultSet rs = DbOperation.executeQuery(query, par);
             JsonArray itemsArray = new JsonArray();
             while (rs.next()) {
                 JsonObject item = new JsonObject();

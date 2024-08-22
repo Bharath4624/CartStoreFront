@@ -43,27 +43,14 @@ public class AddCustomer extends HttpServlet {
     }
 
     public int insertCustomer(Customer customer) throws SQLException, ClassNotFoundException {
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("SELECT * FROM customers WHERE name=? AND address=? AND city=? AND zipcode=? AND country=? AND mobile=? AND email=?");
-        stmt.setString(1, customer.getName());
-        stmt.setString(2, customer.getAddress());
-        stmt.setString(3, customer.getCity());
-        stmt.setString(4, customer.getZipcode());
-        stmt.setString(5, customer.getCountry());
-        stmt.setString(6, customer.getMobile());
-        stmt.setString(7, customer.getEmail());
-        ResultSet rs = stmt.executeQuery();
+        String query = "SELECT * FROM customers WHERE name=? AND address=? AND city=? AND zipcode=? AND country=? AND mobile=? AND email=?";
+        Object[] par = {customer.getName(), customer.getAddress(), customer.getCity(), customer.getZipcode(), customer.getCountry(), customer.getMobile(), customer.getEmail()};
+        ResultSet rs = DbOperation.executeQuery(query, par);
         if (!rs.next()) {
-            stmt = con.prepareStatement("INSERT INTO customers(name,address,city,zipcode,country,mobile,email)VALUES(?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-            stmt.setString(1, customer.getName());
-            stmt.setString(2, customer.getAddress());
-            stmt.setString(3, customer.getCity());
-            stmt.setString(4, customer.getZipcode());
-            stmt.setString(5, customer.getCountry());
-            stmt.setString(6, customer.getMobile());
-            stmt.setString(7, customer.getEmail());
-            stmt.executeUpdate();
-            ResultSet generatedKeys = stmt.getGeneratedKeys();
+            String query1 = "INSERT INTO customers(name,address,city,zipcode,country,mobile,email)VALUES(?,?,?,?,?,?,?)";
+            DbOperation.executeQuery(query1, par);
+            String query2 = "SELECT cus_id FROM customers ORDER BY cus_id DESC LIMIT 1";
+            ResultSet generatedKeys = DbOperation.executeQuery(query2, new Object[]{});
             if (generatedKeys.next()) {
                 return generatedKeys.getInt(1);
             } else {
@@ -74,10 +61,9 @@ public class AddCustomer extends HttpServlet {
     }
 
     public double[] calculateTotal(String cart_id) throws SQLException, ClassNotFoundException {
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("SELECT SUM(subtotal) FROM cart_items WHERE cart_id=?");
-        stmt.setString(1, cart_id);
-        ResultSet rs = stmt.executeQuery();
+        String query = "SELECT SUM(subtotal) FROM cart_items WHERE cart_id=?";
+        Object[] par = {cart_id};
+        ResultSet rs = DbOperation.executeQuery(query, par);
         if (rs.next()) {
             double subtotal = rs.getDouble(1);
             double totaltax = (subtotal * 12) / 100;
@@ -88,13 +74,8 @@ public class AddCustomer extends HttpServlet {
     }
 
     public void updateCart(int cus_id, String cart_id, double[] totals) throws SQLException, ClassNotFoundException {
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("UPDATE cart SET subtotal=?,totalamount=?,cus_id=?,totaltax=? WHERE cart_id=?");
-        stmt.setDouble(1, totals[2]);
-        stmt.setDouble(2, totals[1]);
-        stmt.setInt(3, cus_id);
-        stmt.setDouble(4, totals[0]);
-        stmt.setString(5, cart_id);
-        stmt.executeUpdate();
+        String query = "UPDATE cart SET subtotal=?,totalamount=?,cus_id=?,totaltax=? WHERE cart_id=?";
+        Object[] par = {totals[2], totals[1], cus_id, totals[0], cart_id};
+        DbOperation.executeQuery(query, par);
     }
 }

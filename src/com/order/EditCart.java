@@ -38,13 +38,9 @@ public class EditCart extends HttpServlet {
         double price = item.getSubtotal() / item.getQuantity();
         item.setQuantity(item.getQuantity() + 1);
         item.setSubtotal(item.getQuantity() * price);
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("UPDATE cart_items SET quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?");
-        stmt.setInt(1, item.getQuantity());
-        stmt.setDouble(2, item.getSubtotal());
-        stmt.setString(3, item.getCart_id());
-        stmt.setInt(4, item.getProd_id());
-        stmt.executeUpdate();
+        String query = "UPDATE cart_items SET quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?";
+        Object[] par = {item.getQuantity(), item.getSubtotal(), item.getCart_id(), item.getProd_id()};
+        DbOperation.executeQuery(query, par);
     }
 
     public void doDelete(HttpServletRequest req, HttpServletResponse res) throws IOException {
@@ -73,30 +69,23 @@ public class EditCart extends HttpServlet {
     public void delete(CartItems item) throws SQLException, ClassNotFoundException {
         double price = item.getSubtotal() / item.getQuantity();
         item.setQuantity(item.getQuantity() - 1);
-        Connection con = DatabaseConnection.getConnection();
         if (item.getQuantity() <= 0) {
-            PreparedStatement stmt = con.prepareStatement("DELETE FROM cart_items WHERE prod_id=? AND cart_id=?");
-            stmt.setInt(1, item.getProd_id());
-            stmt.setString(2, item.getCart_id());
-            stmt.executeUpdate();
+            String query = "DELETE FROM cart_items WHERE prod_id=? AND cart_id=?";
+            Object[] par = {item.getProd_id(), item.getCart_id()};
+            DbOperation.executeQuery(query, par);
         } else {
             item.setSubtotal(item.getQuantity() * price);
-            PreparedStatement stmt = con.prepareStatement("UPDATE cart_items SET quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?");
-            stmt.setInt(1, item.getQuantity());
-            stmt.setDouble(2, item.getSubtotal());
-            stmt.setString(3, item.getCart_id());
-            stmt.setInt(4, item.getProd_id());
-            stmt.executeUpdate();
+            String query = "UPDATE cart_items SET quantity=?,subtotal=? WHERE cart_id=? AND prod_id=?";
+            Object[] par = {item.getQuantity(), item.getSubtotal(), item.getCart_id(), item.getProd_id()};
+            DbOperation.executeQuery(query, par);
         }
     }
 
     public CartItems getProductDetails(int prod_id, String cart_id) throws SQLException, ClassNotFoundException {
         CartItems item = null;
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("SELECT * FROM cart_items WHERE prod_id=? AND cart_id=?");
-        stmt.setInt(1, prod_id);
-        stmt.setString(2, cart_id);
-        ResultSet rs = stmt.executeQuery();
+        String query = "SELECT * FROM cart_items WHERE prod_id=? AND cart_id=?";
+        Object[] par = {prod_id, cart_id};
+        ResultSet rs = DbOperation.executeQuery(query, par);
         if (rs.next()) {
             item = new CartItems(rs.getInt("prod_id"), rs.getString("name"), rs.getInt("quantity"), rs.getDouble("subtotal"), rs.getString("cart_id"));
         }
@@ -104,23 +93,18 @@ public class EditCart extends HttpServlet {
     }
 
     public void updateCart(String cart_id) throws SQLException, ClassNotFoundException {
-        Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement("SELECT SUM(subtotal) FROM cart_items WHERE cart_id=?");
-        PreparedStatement stmt1 = con.prepareStatement("SELECT * FROM cart WHERE cart_id=?");
-        stmt.setString(1, cart_id);
-        ResultSet rs = stmt.executeQuery();
-        stmt1.setString(1, cart_id);
-        ResultSet result = stmt1.executeQuery();
+        String query = "SELECT SUM(subtotal) FROM cart_items WHERE cart_id=?";
+        String query1 = "SELECT * FROM cart WHERE cart_id=?";
+        Object[] par = {cart_id};
+        ResultSet rs = DbOperation.executeQuery(query, par);
+        ResultSet result = DbOperation.executeQuery(query1, par);
         if (rs.next() && result.next()) {
             double subtotal = rs.getDouble(1);
             double totaltax = (rs.getDouble(1) * 12) / 100;
             double totalamount = subtotal + totaltax + result.getDouble("shipping_charge") + result.getDouble("service_charge");
-            stmt = con.prepareStatement("UPDATE cart SET subtotal=?,totaltax=?,totalamount=? WHERE cart_id=?");
-            stmt.setDouble(1, subtotal);
-            stmt.setDouble(2, totaltax);
-            stmt.setDouble(3, totalamount);
-            stmt.setString(4, cart_id);
-            stmt.executeUpdate();
+            String query2 = "UPDATE cart SET subtotal=?,totaltax=?,totalamount=? WHERE cart_id=?";
+            Object[] par2 = {subtotal, totaltax, totalamount, cart_id};
+            DbOperation.executeQuery(query2, par2);
         }
     }
 }
