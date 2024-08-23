@@ -11,7 +11,7 @@ import java.util.*;
 @WebServlet("/cart")
 public class AddToCart extends HttpServlet {
     public Gson gson = new Gson();
-    public Cart newCart = new Cart("NULL", null, 0.0, "NULL", 0.0, "NULL", 0.0, 0.0, 0.0, new ArrayList<>());
+    public Cart newCart;
     public Cart cart = new Cart("NULL", null, 0.0, "NULL", 0.0, "NULL", 0.0, 0.0, 0.0, new ArrayList<>());
 
     public void doPut(HttpServletRequest req, HttpServletResponse res) throws IOException {
@@ -69,6 +69,7 @@ public class AddToCart extends HttpServlet {
         Object[] par = {cart_id};
         ResultSet rs = Cart.persist(query, par);
         if (!rs.next()) {
+            newCart = new Cart("NULL", null, 0.0, "NULL", 0.0, "NULL", 0.0, 0.0, 0.0, new ArrayList<>());
             newCart.setCart_id(cart_id);
             newCart.insertCart();
         } else {
