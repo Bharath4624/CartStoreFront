@@ -78,14 +78,11 @@ public class AddCustomer extends HttpServlet {
     }
 
     public void updateCart(int cus_id, String cart_id, double[] totals) throws SQLException, ClassNotFoundException {
-        //String query = "UPDATE cart SET subtotal=?,totalamount=?,cus_id=?,totaltax=? WHERE cart_id=?";
         cart.setSubtotal(totals[2]);
         cart.setTotalamount(totals[1]);
         cart.setCus_id(cus_id);
         cart.setTotaltax(totals[0]);
         cart.updateCart();
-        //Object[] par = {totals[2], totals[1], cus_id, totals[0], cart_id};
-        //Cart.persist(query, par);
     }
 
     public Cart getCart(String cart_id) throws SQLException, ClassNotFoundException {

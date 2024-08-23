@@ -26,7 +26,7 @@ public class PaymentDetails extends HttpServlet {
             addCharges();
             double service_charge = getCharge(payment_mode);
             double[] totals = calculateTotals(cart_id, service_charge);
-            updateCart(totals, service_charge, payment_mode, cart_id);
+            updateCart(totals, service_charge, payment_mode);
             JsonObject response = new JsonObject();
             response.addProperty("payment_mode", payment_mode);
             response.addProperty("service_charge", service_charge);
@@ -62,15 +62,12 @@ public class PaymentDetails extends HttpServlet {
         return new double[]{0, 0, 0};
     }
 
-    public void updateCart(double[] totals, double service_charge, String payment_mode, String cart_id) throws SQLException, ClassNotFoundException {
-        //String query = "UPDATE cart SET totaltax=?,subtotal=?,totalamount=?,payment_mode=?,service_charge=? WHERE cart_id=?";
+    public void updateCart(double[] totals, double service_charge, String payment_mode) throws SQLException, ClassNotFoundException {
         cart.setPayment_mode(payment_mode);
         cart.setService_charge(service_charge);
         cart.setTotaltax(totals[2]);
         cart.setTotalamount(totals[0]);
         cart.setSubtotal(totals[1]);
-        //Object[] par = {totals[2], totals[1], totals[0], payment_mode, service_charge, cart_id};
-        //Cart.persist(query, par);
         cart.updateCart();
     }
 

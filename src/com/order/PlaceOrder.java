@@ -22,7 +22,6 @@ public class PlaceOrder extends HttpServlet {
             int[] details = insertIntoOrder(cart);
             insertInOrderedItems(cart_id, details);
             emptyCart(cart_id);
-            cart=null;
             JsonObject response = new JsonObject();
             response.addProperty("status", "success");
             out.println(response);
@@ -45,9 +44,6 @@ public class PlaceOrder extends HttpServlet {
 
     public int[] insertIntoOrder(Cart cart) throws SQLException, ClassNotFoundException {
         int[] details = new int[2];
-//        String query = "INSERT INTO orders(cus_id,shipping_method,shipping_charge,payment_mode,service_charge,totaltax,totalamount,subtotal)VALUES(?,?,?,?,?,?,?,?)";
-//        Object[] par = {cart.getCus_id(), cart.getShipping_method(), cart.getShipping_charge(), cart.getPayment_mode(), cart.getService_charge(), cart.getTotaltax(), cart.getTotalamount(), cart.getSubtotal()};
-//        Order.persist(query, par);
         order=new Order(cart.getCus_id(),"", cart.getShipping_method(), cart.getShipping_charge(), cart.getPayment_mode(), cart.getService_charge(), cart.getTotaltax(), cart.getTotalamount(), cart.getSubtotal());
         Order.executeQuery(order);
         String query1 = "SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1";

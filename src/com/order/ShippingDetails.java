@@ -68,8 +68,6 @@ public class ShippingDetails extends HttpServlet {
         cart.setTotaltax(totals[2]);
         cart.setTotalamount(totals[0]);
         cart.setSubtotal(totals[1]);
-        //Object[] par = {totals[2], totals[1], totals[0], shipping_charge, shipping_method, cart_id};
-        //Cart.persist(query, par);
         cart.updateCart();
     }
 
