@@ -12,7 +12,7 @@ import java.util.*;
 public class AddToCart extends HttpServlet {
     public Gson gson = new Gson();
     public Cart newCart;
-    public Cart cart = new Cart("NULL", null, 0.0, "NULL", 0.0, "NULL", 0.0, 0.0, 0.0, new ArrayList<>());
+    public Cart cart;
 
     public void doPut(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
@@ -74,6 +74,7 @@ public class AddToCart extends HttpServlet {
             newCart.insertCart();
         } else {
             newCart = null;
+            cart = new Cart("NULL", null, 0.0, "NULL", 0.0, "NULL", 0.0, 0.0, 0.0, new ArrayList<>());
             cart.setCart_id(cart_id);
             cart.setCus_id(rs.getInt("cus_id"));
             cart.setShipping_method(rs.getString("shipping_method"));
