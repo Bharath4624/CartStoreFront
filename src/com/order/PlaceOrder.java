@@ -12,12 +12,13 @@ import java.util.ArrayList;
 public class PlaceOrder extends HttpServlet {
     public Cart cart;
     public Order order;
+
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
         PrintWriter out = res.getWriter();
         try {
             String cart_id = CartId.getCartId(req);
-            cart=getCart(cart_id);
+            cart = getCart(cart_id);
             Cart cart = getCartDetails(cart_id);
             int[] details = insertIntoOrder(cart);
             insertInOrderedItems(cart_id, details);
@@ -37,14 +38,14 @@ public class PlaceOrder extends HttpServlet {
         Object[] par = {cart_id};
         ResultSet rs = Cart.persist(query, par);
         if (rs.next()) {
-            cart = new Cart(rs.getString("cart_id"), rs.getInt("cus_id"), rs.getDouble("totaltax"), rs.getString("shipping_method"), rs.getDouble("shipping_charge"), rs.getString("payment_mode"), rs.getDouble("service_charge"), rs.getDouble("totalamount"), rs.getDouble("subtotal"),new ArrayList<>());
+            cart = new Cart(rs.getString("cart_id"), rs.getInt("cus_id"), rs.getDouble("totaltax"), rs.getString("shipping_method"), rs.getDouble("shipping_charge"), rs.getString("payment_mode"), rs.getDouble("service_charge"), rs.getDouble("totalamount"), rs.getDouble("subtotal"), new ArrayList<>());
         }
         return cart;
     }
 
     public int[] insertIntoOrder(Cart cart) throws SQLException, ClassNotFoundException {
         int[] details = new int[2];
-        order=new Order(cart.getCus_id(),"", cart.getShipping_method(), cart.getShipping_charge(), cart.getPayment_mode(), cart.getService_charge(), cart.getTotaltax(), cart.getTotalamount(), cart.getSubtotal());
+        order = new Order(cart.getCus_id(), "", cart.getShipping_method(), cart.getShipping_charge(), cart.getPayment_mode(), cart.getService_charge(), cart.getTotaltax(), cart.getTotalamount(), cart.getSubtotal());
         Order.executeQuery(order);
         String query1 = "SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1";
         ResultSet generatedKeys = Order.persist(query1, new Object[]{});

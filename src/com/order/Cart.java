@@ -110,7 +110,7 @@ public class Cart {
 
     public void updateCart() throws SQLException, ClassNotFoundException {
         Connection con = DatabaseConnection.getConnection();
-        if(getCus_id()==null || getCus_id()==0) {
+        if (getCus_id() == null || getCus_id() == 0) {
             PreparedStatement stmt = con.prepareStatement("UPDATE cart SET totaltax=?,shipping_method=?,shipping_charge=?,payment_mode=?,service_charge=?,totalamount=?,subtotal=? WHERE cart_id=?");
             stmt.setObject(1, getTotaltax());
             stmt.setObject(2, getShipping_method());
@@ -121,10 +121,9 @@ public class Cart {
             stmt.setObject(7, getSubtotal());
             stmt.setObject(8, getCart_id());
             stmt.executeUpdate();
-        }
-        else{
+        } else {
             PreparedStatement stmt = con.prepareStatement("UPDATE cart SET cus_id=?,totaltax=?,shipping_method=?,shipping_charge=?,payment_mode=?,service_charge=?,totalamount=?,subtotal=? WHERE cart_id=?");
-            stmt.setObject(1,getCus_id());
+            stmt.setObject(1, getCus_id());
             stmt.setObject(2, getTotaltax());
             stmt.setObject(3, getShipping_method());
             stmt.setObject(4, getShipping_charge());

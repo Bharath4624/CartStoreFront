@@ -11,13 +11,14 @@ import java.util.ArrayList;
 @WebServlet("/cart/preview")
 public class OrderPreview extends HttpServlet {
     public Cart cart;
-    public static Customer customer=AddCustomer.customer;
+    public static Customer customer = AddCustomer.customer;
+
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
         PrintWriter out = res.getWriter();
         try {
             String cart_id = CartId.getCartId(req);
-            cart=getCart(cart_id);
+            cart = getCart(cart_id);
             JsonObject response = new JsonObject();
             response.addProperty("cart_id", cart_id);
             response.add("items", getCartItems(cart_id));
@@ -54,7 +55,7 @@ public class OrderPreview extends HttpServlet {
         response.addProperty("subtotal", cart.getSubtotal());
         response.addProperty("totaltax", cart.getTotaltax());
         response.addProperty("totalamount", cart.getTotalamount());
-        if(cart.getCus_id()!=0) {
+        if (cart.getCus_id() != 0) {
             updateCart();
         }
         return response;

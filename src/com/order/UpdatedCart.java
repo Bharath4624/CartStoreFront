@@ -15,9 +15,9 @@ public class UpdatedCart extends HttpServlet {
         PrintWriter out = res.getWriter();
         try {
             String cart_id = CartId.getCartId(req);
-            Cart cart=getCart(cart_id);
+            Cart cart = getCart(cart_id);
             JsonArray itemsArray = new JsonArray();
-            for(CartItems i: cart.getItems()){
+            for (CartItems i : cart.getItems()) {
                 JsonObject item = new JsonObject();
                 item.addProperty("id", i.getProd_id());
                 item.addProperty("name", i.getName());

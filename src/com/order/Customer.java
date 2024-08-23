@@ -93,15 +93,15 @@ public class Customer {
     }
 
     public static void executeQuery(Customer customer) throws SQLException, ClassNotFoundException {
-        Connection con= DatabaseConnection.getConnection();
-        PreparedStatement stmt=con.prepareStatement("INSERT INTO customers(name,address,city,zipcode,country,mobile,email)VALUES(?,?,?,?,?,?,?)");
-        stmt.setObject(1,customer.getName());
-        stmt.setObject(2,customer.getAddress());
-        stmt.setObject(3,customer.getCity());
-        stmt.setObject(4,customer.getZipcode());
-        stmt.setObject(5,customer.getCountry());
-        stmt.setObject(6,customer.getMobile());
-        stmt.setObject(7,customer.getEmail());
+        Connection con = DatabaseConnection.getConnection();
+        PreparedStatement stmt = con.prepareStatement("INSERT INTO customers(name,address,city,zipcode,country,mobile,email)VALUES(?,?,?,?,?,?,?)");
+        stmt.setObject(1, customer.getName());
+        stmt.setObject(2, customer.getAddress());
+        stmt.setObject(3, customer.getCity());
+        stmt.setObject(4, customer.getZipcode());
+        stmt.setObject(5, customer.getCountry());
+        stmt.setObject(6, customer.getMobile());
+        stmt.setObject(7, customer.getEmail());
         stmt.executeUpdate();
     }
 }

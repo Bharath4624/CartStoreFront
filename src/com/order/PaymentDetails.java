@@ -14,6 +14,7 @@ public class PaymentDetails extends HttpServlet {
     public Gson gson = new Gson();
     public Map<String, Double> servicecharge = new HashMap<>();
     public Cart cart;
+
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
         PrintWriter out = res.getWriter();
@@ -22,7 +23,7 @@ public class PaymentDetails extends HttpServlet {
             JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
             String payment_mode = jsonObject.get("method").getAsString();
             String cart_id = CartId.getCartId(req);
-            cart=getCart(cart_id);
+            cart = getCart(cart_id);
             addCharges();
             double service_charge = getCharge(payment_mode);
             double[] totals = calculateTotals(service_charge);
@@ -48,11 +49,11 @@ public class PaymentDetails extends HttpServlet {
     }
 
     public double[] calculateTotals(double service_charge) {
-            double subtotal = cart.getSubtotal();
-            double shipping_charge = cart.getShipping_charge();
-            double totaltax = cart.getTotaltax();
-            double totalamount = subtotal + shipping_charge + totaltax + service_charge;
-            return new double[]{totalamount, subtotal, totaltax};
+        double subtotal = cart.getSubtotal();
+        double shipping_charge = cart.getShipping_charge();
+        double totaltax = cart.getTotaltax();
+        double totalamount = subtotal + shipping_charge + totaltax + service_charge;
+        return new double[]{totalamount, subtotal, totaltax};
     }
 
     public void updateCart(double[] totals, double service_charge, String payment_mode) throws SQLException, ClassNotFoundException {

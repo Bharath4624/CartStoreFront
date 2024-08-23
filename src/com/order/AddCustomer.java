@@ -13,6 +13,7 @@ public class AddCustomer extends HttpServlet {
     public Gson gson = new Gson();
     public Cart cart;
     public static Customer customer;
+
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
         PrintWriter out = res.getWriter();
@@ -28,11 +29,11 @@ public class AddCustomer extends HttpServlet {
             String mobile = customerjson.get("mobile").getAsString();
             String email = customerjson.get("email").getAsString();
             String cart_id = CartId.getCartId(req);
-            cart=getCart(cart_id);
-            customer=new Customer(name, address, city, zipcode, country, mobile, email);
+            cart = getCart(cart_id);
+            customer = new Customer(name, address, city, zipcode, country, mobile, email);
             int cus_id = insertCustomer(customer);
             double[] totals = calculateTotal();
-            updateCart(cus_id,totals);
+            updateCart(cus_id, totals);
             JsonObject response = new JsonObject();
             response.addProperty("status", "Customer added");
             response.addProperty("subtotal", cart.getSubtotal());
@@ -63,14 +64,14 @@ public class AddCustomer extends HttpServlet {
         return rs.getInt("cus_id");
     }
 
-    public double[] calculateTotal(){
-            double subtotal = cart.getSubtotal();
-            double totaltax = (subtotal * 12) / 100;
-            double totalamount = subtotal + totaltax;
-            return new double[]{totaltax, totalamount, subtotal};
+    public double[] calculateTotal() {
+        double subtotal = cart.getSubtotal();
+        double totaltax = (subtotal * 12) / 100;
+        double totalamount = subtotal + totaltax;
+        return new double[]{totaltax, totalamount, subtotal};
     }
 
-    public void updateCart(int cus_id,double[] totals) throws SQLException, ClassNotFoundException {
+    public void updateCart(int cus_id, double[] totals) throws SQLException, ClassNotFoundException {
         cart.setSubtotal(totals[2]);
         cart.setTotalamount(totals[1]);
         cart.setCus_id(cus_id);
