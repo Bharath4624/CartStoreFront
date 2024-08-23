@@ -30,7 +30,7 @@ public class AddToCart extends HttpServlet {
                 if (item != null) {
                     response.addProperty("status", "success");
                     addToCartItems(item, cart_id);
-                    updateCart();
+                    updateCart(cart_id);
                 } else {
                     response.addProperty("status", "failed,product does not exist");
                     return;
@@ -100,7 +100,7 @@ public class AddToCart extends HttpServlet {
 
     public void addToCartItems(CartItems item, String cart_id) throws SQLException, ClassNotFoundException {
         boolean itemExists = false;
-        for (CartItems i : newCart.getItems()) {
+        for (CartItems i : cart.getItems()) {
             if (i.getProd_id() == item.getProd_id()) {
                 itemExists = true;
                 i.setQuantity(i.getQuantity() + 1);
@@ -109,20 +109,32 @@ public class AddToCart extends HttpServlet {
             }
         }
         if (itemExists) {
-            newCart.updateItems();
+            cart.updateItems();
+        } else if (!itemExists && cart.getCart_id().equals(cart_id)) {
+            cart.getItems().add(item);
+            cart.insertItems(item);
         } else {
             newCart.getItems().add(item);
             newCart.insertItems(item);
         }
     }
 
-    public void updateCart() throws SQLException, ClassNotFoundException {
+    public void updateCart(String cart_id) throws SQLException, ClassNotFoundException {
         double subtotal = 0;
-        for (CartItems i : newCart.getItems()) {
-            subtotal += i.getSubtotal();
+        if (cart.getCart_id().equals(cart_id)) {
+            for (CartItems i : cart.getItems()) {
+                subtotal += i.getSubtotal();
+            }
+            cart.setSubtotal(subtotal);
+            cart.setTotaltax((subtotal * 12) / 100);
+            cart.updateCart();
+        } else {
+            for (CartItems i : newCart.getItems()) {
+                subtotal += i.getSubtotal();
+            }
+            newCart.setSubtotal(subtotal);
+            newCart.setTotaltax((subtotal * 12) / 100);
+            newCart.updateCart();
         }
-        newCart.setSubtotal(subtotal);
-        newCart.setTotaltax((subtotal * 12) / 100);
-        newCart.updateCart();
     }
 }
