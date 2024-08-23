@@ -25,13 +25,12 @@ public class PaymentDetails extends HttpServlet {
             cart=getCart(cart_id);
             addCharges();
             double service_charge = getCharge(payment_mode);
-            double[] totals = calculateTotals(cart_id, service_charge);
+            double[] totals = calculateTotals(service_charge);
             updateCart(totals, service_charge, payment_mode);
             JsonObject response = new JsonObject();
             response.addProperty("payment_mode", payment_mode);
             response.addProperty("service_charge", service_charge);
-            response.addProperty("totalamount", totals[0]);
-            System.out.println(cart.getCart_id()+" "+cart.getCus_id()+" "+cart.getShipping_method()+" "+cart.getShipping_charge()+" "+cart.getPayment_mode()+" "+cart.getService_charge()+" "+cart.getSubtotal()+" "+cart.getTotaltax()+" "+cart.getTotalamount());
+            response.addProperty("totalamount", cart.getTotalamount());
             out.println(response);
             out.flush();
         } catch (Exception e) {
@@ -48,18 +47,12 @@ public class PaymentDetails extends HttpServlet {
         return servicecharge.get(payment_mode);
     }
 
-    public double[] calculateTotals(String cart_id, double service_charge) throws SQLException, ClassNotFoundException {
-        String query = "SELECT SUM(cart_items.subtotal),cart.shipping_charge FROM cart INNER JOIN cart_items ON cart_items.cart_id=cart.cart_id WHERE cart.cart_id=?";
-        Object[] par = {cart_id};
-        ResultSet rs = Cart.persist(query, par);
-        if (rs.next()) {
-            double subtotal = rs.getDouble(1);
-            double shipping_charge = rs.getDouble(2);
-            double totaltax = (subtotal * 12) / 100;
+    public double[] calculateTotals(double service_charge) {
+            double subtotal = cart.getSubtotal();
+            double shipping_charge = cart.getShipping_charge();
+            double totaltax = cart.getSubtotal();
             double totalamount = subtotal + shipping_charge + totaltax + service_charge;
             return new double[]{totalamount, subtotal, totaltax};
-        }
-        return new double[]{0, 0, 0};
     }
 
     public void updateCart(double[] totals, double service_charge, String payment_mode) throws SQLException, ClassNotFoundException {

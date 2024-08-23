@@ -31,14 +31,13 @@ public class AddCustomer extends HttpServlet {
             cart=getCart(cart_id);
             customer=new Customer(name, address, city, zipcode, country, mobile, email);
             int cus_id = insertCustomer(customer);
-            double[] totals = calculateTotal(cart_id);
+            double[] totals = calculateTotal();
             updateCart(cus_id,totals);
             JsonObject response = new JsonObject();
             response.addProperty("status", "Customer added");
-            response.addProperty("subtotal", totals[2]);
-            response.addProperty("totaltax", totals[0]);
-            response.addProperty("totalamount", totals[1]);
-            System.out.println(cart.getCart_id()+" "+cart.getCus_id()+" "+cart.getShipping_method()+" "+cart.getShipping_charge()+" "+cart.getPayment_mode()+" "+cart.getService_charge()+" "+cart.getSubtotal()+" "+cart.getTotaltax()+" "+cart.getTotalamount());
+            response.addProperty("subtotal", cart.getSubtotal());
+            response.addProperty("totaltax", cart.getTotaltax());
+            response.addProperty("totalamount", cart.getTotalamount());
             out.println(response);
             out.flush();
         } catch (Exception e) {
@@ -64,17 +63,11 @@ public class AddCustomer extends HttpServlet {
         return rs.getInt("cus_id");
     }
 
-    public double[] calculateTotal(String cart_id) throws SQLException, ClassNotFoundException {
-        String query = "SELECT SUM(subtotal) FROM cart_items WHERE cart_id=?";
-        Object[] par = {cart_id};
-        ResultSet rs = CartItems.persist(query, par);
-        if (rs.next()) {
-            double subtotal = rs.getDouble(1);
+    public double[] calculateTotal(){
+            double subtotal = cart.getSubtotal();
             double totaltax = (subtotal * 12) / 100;
             double totalamount = subtotal + totaltax;
             return new double[]{totaltax, totalamount, subtotal};
-        }
-        return new double[]{0, 0, 0};
     }
 
     public void updateCart(int cus_id,double[] totals) throws SQLException, ClassNotFoundException {
