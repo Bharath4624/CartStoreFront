@@ -30,7 +30,7 @@ public class AddToCart extends HttpServlet {
                 if (item != null) {
                     response.addProperty("status", "success");
                     addToCartItems(item, cart_id);
-                    updateCart(cart_id);
+                    updateCart();
                 } else {
                     response.addProperty("status", "failed,product does not exist");
                     return;
@@ -73,7 +73,6 @@ public class AddToCart extends HttpServlet {
             newCart.setCart_id(cart_id);
             newCart.insertCart();
         } else {
-            newCart = null;
             cart = new Cart("NULL", null, 0.0, "NULL", 0.0, "NULL", 0.0, 0.0, 0.0, new ArrayList<>());
             cart.setCart_id(cart_id);
             cart.setCus_id(rs.getInt("cus_id"));
@@ -101,7 +100,7 @@ public class AddToCart extends HttpServlet {
 
     public void addToCartItems(CartItems item, String cart_id) throws SQLException, ClassNotFoundException {
         boolean itemExists = false;
-        for (CartItems i : cart.getItems()) {
+        for (CartItems i : newCart.getItems()) {
             if (i.getProd_id() == item.getProd_id()) {
                 itemExists = true;
                 i.setQuantity(i.getQuantity() + 1);
@@ -110,32 +109,20 @@ public class AddToCart extends HttpServlet {
             }
         }
         if (itemExists) {
-            cart.updateItems();
-        } else if (cart.getCart_id().equals(cart_id) && !itemExists) {
-            cart.getItems().add(item);
-            cart.insertItems(item);
+            newCart.updateItems();
         } else {
             newCart.getItems().add(item);
             newCart.insertItems(item);
         }
     }
 
-    public void updateCart(String cart_id) throws SQLException, ClassNotFoundException {
+    public void updateCart() throws SQLException, ClassNotFoundException {
         double subtotal = 0;
-        if (cart.getCart_id().equals(cart_id)) {
-            for (CartItems i : cart.getItems()) {
-                subtotal += i.getSubtotal();
-            }
-            cart.setSubtotal(subtotal);
-            cart.setTotaltax((subtotal * 12) / 100);
-            cart.updateCart();
-        } else {
-            for (CartItems i : newCart.getItems()) {
-                subtotal += i.getSubtotal();
-            }
-            newCart.setSubtotal(subtotal);
-            newCart.setTotaltax((subtotal * 12) / 100);
-            newCart.updateCart();
+        for (CartItems i : newCart.getItems()) {
+            subtotal += i.getSubtotal();
         }
+        newCart.setSubtotal(subtotal);
+        newCart.setTotaltax((subtotal * 12) / 100);
+        newCart.updateCart();
     }
 }
