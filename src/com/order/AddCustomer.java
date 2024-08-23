@@ -32,7 +32,7 @@ public class AddCustomer extends HttpServlet {
             customer=new Customer(name, address, city, zipcode, country, mobile, email);
             int cus_id = insertCustomer(customer);
             double[] totals = calculateTotal(cart_id);
-            updateCart(cus_id, cart_id, totals);
+            updateCart(cus_id,totals);
             JsonObject response = new JsonObject();
             response.addProperty("status", "Customer added");
             response.addProperty("subtotal", totals[2]);
@@ -77,7 +77,7 @@ public class AddCustomer extends HttpServlet {
         return new double[]{0, 0, 0};
     }
 
-    public void updateCart(int cus_id, String cart_id, double[] totals) throws SQLException, ClassNotFoundException {
+    public void updateCart(int cus_id,double[] totals) throws SQLException, ClassNotFoundException {
         cart.setSubtotal(totals[2]);
         cart.setTotalamount(totals[1]);
         cart.setCus_id(cus_id);
