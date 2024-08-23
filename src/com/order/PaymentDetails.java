@@ -50,7 +50,7 @@ public class PaymentDetails extends HttpServlet {
     public double[] calculateTotals(double service_charge) {
             double subtotal = cart.getSubtotal();
             double shipping_charge = cart.getShipping_charge();
-            double totaltax = cart.getSubtotal();
+            double totaltax = cart.getTotaltax();
             double totalamount = subtotal + shipping_charge + totaltax + service_charge;
             return new double[]{totalamount, subtotal, totaltax};
     }
