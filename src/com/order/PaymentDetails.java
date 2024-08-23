@@ -13,7 +13,7 @@ import java.util.*;
 public class PaymentDetails extends HttpServlet {
     public Gson gson = new Gson();
     public Map<String, Double> servicecharge = new HashMap<>();
-    public Cart cart=ShippingDetails.cart;
+    public Cart cart;
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
         PrintWriter out = res.getWriter();
@@ -22,6 +22,7 @@ public class PaymentDetails extends HttpServlet {
             JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
             String payment_mode = jsonObject.get("method").getAsString();
             String cart_id = CartId.getCartId(req);
+            cart=getCart(cart_id);
             addCharges();
             double service_charge = getCharge(payment_mode);
             double[] totals = calculateTotals(cart_id, service_charge);
@@ -62,13 +63,34 @@ public class PaymentDetails extends HttpServlet {
     }
 
     public void updateCart(double[] totals, double service_charge, String payment_mode, String cart_id) throws SQLException, ClassNotFoundException {
-        String query = "UPDATE cart SET totaltax=?,subtotal=?,totalamount=?,payment_mode=?,service_charge=? WHERE cart_id=?";
+        //String query = "UPDATE cart SET totaltax=?,subtotal=?,totalamount=?,payment_mode=?,service_charge=? WHERE cart_id=?";
         cart.setPayment_mode(payment_mode);
         cart.setService_charge(service_charge);
         cart.setTotaltax(totals[2]);
         cart.setTotalamount(totals[0]);
         cart.setSubtotal(totals[1]);
-        Object[] par = {totals[2], totals[1], totals[0], payment_mode, service_charge, cart_id};
-        Cart.persist(query, par);
+        //Object[] par = {totals[2], totals[1], totals[0], payment_mode, service_charge, cart_id};
+        //Cart.persist(query, par);
+        cart.updateCart();
+    }
+
+    public Cart getCart(String cart_id) throws SQLException, ClassNotFoundException {
+        Cart cart = new Cart("NULL", null, 0.0, "NULL", 0.0, "NULL", 0.0, 0.0, 0.0, new ArrayList<>());
+        String query = "SELECT * FROM cart WHERE cart_id=?";
+        Object[] par = {cart_id};
+        ResultSet rs = Cart.persist(query, par);
+        if (rs.next()) {
+            cart.setCart_id(cart_id);
+            cart.setCus_id(rs.getInt("cus_id"));
+            cart.setShipping_method(rs.getString("shipping_method"));
+            cart.setShipping_charge(rs.getDouble("shipping_charge"));
+            cart.setPayment_mode(rs.getString("payment_mode"));
+            cart.setService_charge(rs.getDouble("service_charge"));
+            cart.setSubtotal(rs.getDouble("subtotal"));
+            cart.setTotaltax(rs.getDouble("totaltax"));
+            cart.setTotalamount(rs.getDouble("totalamount"));
+            cart.setItems(CartItems.getItems(cart_id));
+        }
+        return cart;
     }
 }
