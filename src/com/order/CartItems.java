@@ -91,6 +91,11 @@ public class CartItems {
             stmt.setObject(5, i.getCart_id());
             stmt.setObject(6,i.getProd_id());
             stmt.executeUpdate();
+        } else if(query.equalsIgnoreCase("delete")){
+            PreparedStatement stmt=con.prepareStatement("DELETE FROM cart_items WHERE cart_id=? AND prod_id=?");
+            stmt.setObject(1,i.getCart_id());
+            stmt.setObject(2,i.getProd_id());
+            stmt.executeUpdate();
         }
     }
 }

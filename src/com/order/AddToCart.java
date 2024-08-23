@@ -111,9 +111,14 @@ public class AddToCart extends HttpServlet {
         Object[] par = {cart_id};
         ResultSet rs = CartItems.persist(query, par);
         if (rs.next()) {
-            String query1 = "UPDATE cart SET subtotal=? WHERE cart_id=?";
-            Object[] par1 = {rs.getDouble(1), cart_id};
-            cart.setSubtotal(rs.getDouble(1));
+            String query1 = "UPDATE cart SET subtotal=?,totaltax=?,totalamount=? WHERE cart_id=?";
+            double subtotal=rs.getDouble(1);
+            double totaltax=(rs.getDouble(1)*12)/100;
+            double totalamount=subtotal+totaltax;
+            Object[] par1 = {subtotal,totaltax,totalamount,cart_id};
+            cart.setSubtotal(subtotal);
+            cart.setTotaltax(totaltax);
+            cart.setTotalamount(totalamount);
             Cart.persist(query1, par1);
         }
     }

@@ -27,7 +27,7 @@ public class EditCart extends HttpServlet {
             JsonObject response = new JsonObject();
             response.addProperty("cart_id", cart_id);
             response.addProperty("status", "success");
-            System.out.println(cart.getCart_id()+" "+cart.getSubtotal()+" "+cart.getTotaltax()+" "+cart.getTotalamount());
+            System.out.println(cart.getCart_id()+" "+cart.getCus_id()+" "+cart.getShipping_method()+" "+cart.getShipping_charge()+" "+cart.getPayment_mode()+" "+cart.getService_charge()+" "+cart.getSubtotal()+" "+cart.getTotaltax()+" "+cart.getTotalamount());
             out.print(response);
             out.flush();
         } catch (Exception e) {
@@ -70,9 +70,7 @@ public class EditCart extends HttpServlet {
         double price = item.getSubtotal() / item.getQuantity();
         item.setQuantity(item.getQuantity() - 1);
         if (item.getQuantity() <= 0) {
-            String query = "DELETE FROM cart_items WHERE prod_id=? AND cart_id=?";
-            Object[] par = {item.getProd_id(), item.getCart_id()};
-            CartItems.persist(query, par);
+            CartItems.executeQuery(item,"delete");
         } else {
             item.setSubtotal(item.getQuantity() * price);
             CartItems.executeQuery(item,"update");
