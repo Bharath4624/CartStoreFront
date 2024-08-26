@@ -116,7 +116,7 @@ public class Order {
         Connection con = DatabaseConnection.getConnection();
         PreparedStatement stmt = con.prepareStatement("INSERT INTO orders(cus_id,shipping_method,shipping_charge,payment_mode,service_charge,totaltax,totalamount,subtotal)VALUES(?,?,?,?,?,?,?,?)");
         stmt.setObject(1, order.getCus_id());
-        stmt.setObject(2, order.getShipping_charge());
+        stmt.setObject(2, order.getShipping_method());
         stmt.setObject(3, order.getShipping_charge());
         stmt.setObject(4, order.getPayment_mode());
         stmt.setObject(5, order.getService_charge());
