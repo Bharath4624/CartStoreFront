@@ -100,17 +100,19 @@ public class AddToCart extends HttpServlet {
 
     public void addToCartItems(CartItems item, String cart_id) throws SQLException, ClassNotFoundException {
         boolean itemExists = false;
-        for (CartItems i : cart.getItems()) {
-            if (i.getProd_id() == item.getProd_id()) {
-                itemExists = true;
-                i.setQuantity(i.getQuantity() + 1);
-                i.setSubtotal(i.getQuantity() * item.getSubtotal());
-                break;
+        if(cart!=null) {
+            for (CartItems i : cart.getItems()) {
+                if (i.getProd_id() == item.getProd_id()) {
+                    itemExists = true;
+                    i.setQuantity(i.getQuantity() + 1);
+                    i.setSubtotal(i.getQuantity() * item.getSubtotal());
+                    break;
+                }
             }
         }
         if (itemExists) {
             cart.updateItems();
-        } else if (!itemExists && cart.getCart_id().equals(cart_id)) {
+        } else if (cart!=null && !itemExists && cart.getCart_id().equals(cart_id)) {
             cart.getItems().add(item);
             cart.insertItems(item);
         } else {
@@ -121,7 +123,7 @@ public class AddToCart extends HttpServlet {
 
     public void updateCart(String cart_id) throws SQLException, ClassNotFoundException {
         double subtotal = 0;
-        if (cart.getCart_id().equals(cart_id)) {
+        if (cart!=null && cart.getCart_id().equals(cart_id)) {
             for (CartItems i : cart.getItems()) {
                 subtotal += i.getSubtotal();
             }
