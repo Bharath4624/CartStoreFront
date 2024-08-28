@@ -1,5 +1,6 @@
 package com.order;
 
+
 import java.sql.*;
 import java.util.*;
 
@@ -108,10 +109,72 @@ public class Cart {
         this.totalamount = totalamount;
     }
 
+    public void compareCart(Cart oldCart) throws SQLException, ClassNotFoundException {
+        if (oldCart != null && oldCart.getCart_id().equals(this.getCart_id())) {
+            List<String> query = new ArrayList<>();
+            List<Object> param = new ArrayList<>();
+            if (!this.getCus_id().equals(oldCart.getCus_id())) {
+                query.add("cus_id=?");
+                param.add(this.getCus_id());
+            }
+            if (!this.getShipping_method().equals(oldCart.getShipping_method())) {
+                query.add("shipping_method=?");
+                param.add(this.getShipping_method());
+            }
+            if (this.getShipping_charge() != oldCart.getShipping_charge()) {
+                query.add("shipping_charge=?");
+                param.add(this.getShipping_charge());
+            }
+            if (!this.getPayment_mode().equals(oldCart.getPayment_mode())) {
+                query.add("payment_mode=?");
+                param.add(this.getPayment_mode());
+            }
+            if (this.getService_charge() != oldCart.getService_charge()) {
+                query.add("service_charge=?");
+                param.add(this.getService_charge());
+            }
+            if (this.getSubtotal() != oldCart.getSubtotal()) {
+                query.add("subtotal=?");
+                param.add(this.getSubtotal());
+            }
+            if (this.getTotaltax() != oldCart.getTotaltax()) {
+                query.add("totaltax=?");
+                param.add(this.getTotaltax());
+            }
+            if (this.getTotalamount() != oldCart.getTotalamount()) {
+                query.add("totalamount=?");
+                param.add(this.getTotalamount());
+            }
+            if (!query.isEmpty()) {
+                String q = "UPDATE cart SET " + String.join(",", query) + " WHERE cart_id=?";
+                param.add(this.getCart_id());
+                persist(q, param.toArray());
+            }
+        }
+    }
+
+    public void compareCartItems(Cart oldCart) throws SQLException, ClassNotFoundException {
+        if (oldCart != null && oldCart.getCart_id().equals(this.cart_id)){
+            List<CartItems> oldItems=oldCart.getItems();
+            List<CartItems> newItems=this.getItems();
+            if(newItems.size()<oldItems.size()){
+                for(CartItems item:oldItems){
+                    if(!newItems.contains(item)){
+                        deleteItems(item);
+                    }
+                }
+            }
+            else{
+                this.updateItems();
+            }
+        }
+    }
+
     public void updateCart() throws SQLException, ClassNotFoundException {
         Connection con = DatabaseConnection.getConnection();
+        PreparedStatement stmt;
         if (getCus_id() == null || getCus_id() == 0) {
-            PreparedStatement stmt = con.prepareStatement("UPDATE cart SET totaltax=?,shipping_method=?,shipping_charge=?,payment_mode=?,service_charge=?,totalamount=?,subtotal=? WHERE cart_id=?");
+            stmt = con.prepareStatement("UPDATE cart SET totaltax=?,shipping_method=?,shipping_charge=?,payment_mode=?,service_charge=?,totalamount=?,subtotal=? WHERE cart_id=?");
             stmt.setObject(1, getTotaltax());
             stmt.setObject(2, getShipping_method());
             stmt.setObject(3, getShipping_charge());
@@ -120,9 +183,8 @@ public class Cart {
             stmt.setObject(6, getTotalamount());
             stmt.setObject(7, getSubtotal());
             stmt.setObject(8, getCart_id());
-            stmt.executeUpdate();
         } else {
-            PreparedStatement stmt = con.prepareStatement("UPDATE cart SET cus_id=?,totaltax=?,shipping_method=?,shipping_charge=?,payment_mode=?,service_charge=?,totalamount=?,subtotal=? WHERE cart_id=?");
+            stmt = con.prepareStatement("UPDATE cart SET cus_id=?,totaltax=?,shipping_method=?,shipping_charge=?,payment_mode=?,service_charge=?,totalamount=?,subtotal=? WHERE cart_id=?");
             stmt.setObject(1, getCus_id());
             stmt.setObject(2, getTotaltax());
             stmt.setObject(3, getShipping_method());
@@ -132,8 +194,8 @@ public class Cart {
             stmt.setObject(7, getTotalamount());
             stmt.setObject(8, getSubtotal());
             stmt.setObject(9, getCart_id());
-            stmt.executeUpdate();
         }
+        stmt.executeUpdate();
         con.close();
 
     }
