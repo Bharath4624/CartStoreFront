@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class AddCustomer extends HttpServlet {
     public Gson gson = new Gson();
     public Cart cart;
+    public Cart newCart;
     public static Customer customer;
 
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
@@ -30,15 +31,17 @@ public class AddCustomer extends HttpServlet {
             String email = customerjson.get("email").getAsString();
             String cart_id = CartId.getCartId(req);
             cart = getCart(cart_id);
+            newCart = getCart(cart_id);
             customer = new Customer(name, address, city, zipcode, country, mobile, email);
             int cus_id = insertCustomer(customer);
             double[] totals = calculateTotal();
             updateCart(cus_id, totals);
+            newCart.compareCart(cart);
             JsonObject response = new JsonObject();
             response.addProperty("status", "Customer added");
-            response.addProperty("subtotal", cart.getSubtotal());
-            response.addProperty("totaltax", cart.getTotaltax());
-            response.addProperty("totalamount", cart.getTotalamount());
+            response.addProperty("subtotal", newCart.getSubtotal());
+            response.addProperty("totaltax", newCart.getTotaltax());
+            response.addProperty("totalamount", newCart.getTotalamount());
             out.println(response);
             out.flush();
         } catch (Exception e) {
@@ -65,18 +68,17 @@ public class AddCustomer extends HttpServlet {
     }
 
     public double[] calculateTotal() {
-        double subtotal = cart.getSubtotal();
+        double subtotal = newCart.getSubtotal();
         double totaltax = (subtotal * 12) / 100;
         double totalamount = subtotal + totaltax;
         return new double[]{totaltax, totalamount, subtotal};
     }
 
-    public void updateCart(int cus_id, double[] totals) throws SQLException, ClassNotFoundException {
-        cart.setSubtotal(totals[2]);
-        cart.setTotalamount(totals[1]);
-        cart.setCus_id(cus_id);
-        cart.setTotaltax(totals[0]);
-        cart.updateCart();
+    public void updateCart(int cus_id, double[] totals) {
+        newCart.setSubtotal(totals[2]);
+        newCart.setTotalamount(totals[1]);
+        newCart.setCus_id(cus_id);
+        newCart.setTotaltax(totals[0]);
     }
 
     public Cart getCart(String cart_id) throws SQLException, ClassNotFoundException {
