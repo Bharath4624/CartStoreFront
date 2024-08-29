@@ -122,7 +122,7 @@ public class Cart {
         this.totalamount = totalamount;
     }
 
-    public void compareCart(Cart oldCart) throws SQLException, ClassNotFoundException {
+    public void compareCart(Cart oldCart) throws SQLException, ClassNotFoundException, IllegalAccessException {
         if (oldCart != null && oldCart.getCart_id().equals(this.getCart_id())) {
             List<String> query = new ArrayList<>();
             List<Object> param = new ArrayList<>();
@@ -131,16 +131,12 @@ public class Cart {
                 if (field.isAnnotationPresent(Column.class)) {
                     Column column = field.getAnnotation(Column.class);
                     field.setAccessible(true);
-                    try {
-                        Object newValue = field.get(this);
-                        Object oldValue = field.get(oldCart);
-                        if (!oldValue.equals(newValue)) {
-                            System.out.println(column.name() + " " + oldValue + " " + newValue);
-                            query.add(column.name() + "=?");
-                            param.add(newValue);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    Object newValue = field.get(this);
+                    Object oldValue = field.get(oldCart);
+                    if (!newValue.equals(oldValue)) {
+                        System.out.println(column.name() + " " + oldValue + " " + newValue);
+                        query.add(column.name() + "=?");
+                        param.add(newValue);
                     }
                 }
             }
