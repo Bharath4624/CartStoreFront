@@ -131,7 +131,6 @@ public class Cart {
             for (Field field : c.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Column.class)) {
                     Column column = field.getAnnotation(Column.class);
-                    field.setAccessible(true);
                     Object newValue = field.get(this);
                     Object oldValue = field.get(oldCart);
                     if (!newValue.equals(oldValue)) {
