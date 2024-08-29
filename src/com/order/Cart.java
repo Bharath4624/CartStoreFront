@@ -197,7 +197,6 @@ public class Cart {
         }
         stmt.executeUpdate();
         con.close();
-
     }
 
     public void insertCart() throws SQLException, ClassNotFoundException {
