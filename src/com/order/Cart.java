@@ -6,25 +6,25 @@ import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.*;
 
-@Table(name="cart")
+@Table(name = "cart")
 public class Cart {
-    @Column(name="cart_id")
+    @Column(name = "cart_id")
     public String cart_id;
-    @Column(name="cus_id")
+    @Column(name = "cus_id")
     public Integer cus_id;
-    @Column(name="totaltax")
+    @Column(name = "totaltax")
     public double totaltax;
-    @Column(name="shipping_method")
+    @Column(name = "shipping_method")
     public String shipping_method;
-    @Column(name="shipping_charge")
+    @Column(name = "shipping_charge")
     public double shipping_charge;
-    @Column(name="payment_mode")
+    @Column(name = "payment_mode")
     public String payment_mode;
-    @Column(name="service_charge")
+    @Column(name = "service_charge")
     public double service_charge;
-    @Column(name="totalamount")
+    @Column(name = "totalamount")
     public double totalamount;
-    @Column(name="subtotal")
+    @Column(name = "subtotal")
     public double subtotal;
 
     public List<CartItems> items;
@@ -134,15 +134,8 @@ public class Cart {
                     try {
                         Object newValue = field.get(this);
                         Object oldValue = field.get(oldCart);
-                        System.out.println(column.name()+" "+oldValue+" "+newValue);
-                        if (oldValue == null) {
-                            if (newValue != null) {
-                                System.out.println(column.name());
-                                queryParts.add(column.name() + "=?");
-                                parameters.add(newValue);
-                            }
-                        } else if (!oldValue.equals(newValue)) {
-                            System.out.println(column.name());
+                        if (!oldValue.equals(newValue)) {
+                            System.out.println(column.name() + " " + oldValue + " " + newValue);
                             queryParts.add(column.name() + "=?");
                             parameters.add(newValue);
                         }
@@ -154,25 +147,24 @@ public class Cart {
             if (!queryParts.isEmpty()) {
                 String query = "UPDATE cart SET " + String.join(", ", queryParts) + " WHERE cart_id=?";
                 parameters.add(this.getCart_id());
-                System.out.println("Generated SQL Query: " + query);
-                System.out.println("Parameters: " + parameters);
+                System.out.println("Generated SQL Query:" + query);
+                System.out.println("Parameters:" + parameters);
                 persist(query, parameters.toArray());
             }
         }
     }
 
     public void compareCartItems(Cart oldCart) throws SQLException, ClassNotFoundException {
-        if (oldCart != null && oldCart.getCart_id().equals(this.cart_id)){
-            List<CartItems> oldItems=oldCart.getItems();
-            List<CartItems> newItems=this.getItems();
-            if(newItems.size()<oldItems.size()){
-                for(CartItems item:oldItems){
-                    if(!newItems.contains(item)){
+        if (oldCart != null && oldCart.getCart_id().equals(this.cart_id)) {
+            List<CartItems> oldItems = oldCart.getItems();
+            List<CartItems> newItems = this.getItems();
+            if (newItems.size() < oldItems.size()) {
+                for (CartItems item : oldItems) {
+                    if (!newItems.contains(item)) {
                         deleteItems(item);
                     }
                 }
-            }
-            else{
+            } else {
                 this.updateItems();
             }
         }

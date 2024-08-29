@@ -29,8 +29,8 @@ public class AddToCart extends HttpServlet {
                 CartItems item = getProductDetails(prod_id, cart_id);
                 if (item != null) {
                     response.addProperty("status", "success");
-                    addToCartItems(item, cart_id);
-                    updateCart(cart_id);
+                    addToCartItems(item);
+                    updateCart();
                     newCart.compareCart(cart);
                     newCart.compareCartItems(cart);
                 } else {
@@ -86,7 +86,17 @@ public class AddToCart extends HttpServlet {
             cart.setTotaltax(rs.getDouble("totaltax"));
             cart.setTotalamount(rs.getDouble("totalamount"));
             cart.setItems(CartItems.getItems(cart_id));
-            newCart=cart;
+            newCart = new Cart("NULL", null, 0.0, "NULL", 0.0, "NULL", 0.0, 0.0, 0.0, new ArrayList<>());
+            newCart.setCart_id(cart_id);
+            newCart.setCus_id(rs.getInt("cus_id"));
+            newCart.setShipping_method(rs.getString("shipping_method"));
+            newCart.setShipping_charge(rs.getDouble("shipping_charge"));
+            newCart.setPayment_mode(rs.getString("payment_mode"));
+            newCart.setService_charge(rs.getDouble("service_charge"));
+            newCart.setSubtotal(rs.getDouble("subtotal"));
+            newCart.setTotaltax(rs.getDouble("totaltax"));
+            newCart.setTotalamount(rs.getDouble("totalamount"));
+            newCart.setItems(CartItems.getItems(cart_id));
         }
     }
 
@@ -101,9 +111,9 @@ public class AddToCart extends HttpServlet {
         return item;
     }
 
-    public void addToCartItems(CartItems item, String cart_id) throws SQLException, ClassNotFoundException {
+    public void addToCartItems(CartItems item) throws SQLException, ClassNotFoundException {
         boolean itemExists = false;
-        if(newCart!=null) {
+        if (newCart != null) {
             for (CartItems i : newCart.getItems()) {
                 if (i.getProd_id() == item.getProd_id()) {
                     itemExists = true;
@@ -113,35 +123,19 @@ public class AddToCart extends HttpServlet {
                 }
             }
         }
-//        if (itemExists) {
-//            newCart.updateItems();
-//        }
-//        else if (cart!=null && !itemExists && cart.getCart_id().equals(cart_id)) {
-//            cart.getItems().add(item);
-//            cart.insertItems(item);
-//        }
-        if(!itemExists) {
+        if (!itemExists) {
             newCart.getItems().add(item);
             newCart.insertItems(item);
         }
     }
 
-    public void updateCart(String cart_id) throws SQLException, ClassNotFoundException {
+    public void updateCart() {
         double subtotal = 0;
-//        if (cart!=null && cart.getCart_id().equals(cart_id)) {
-//            for (CartItems i : cart.getItems()) {
-//                subtotal += i.getSubtotal();
-//            }
-//            cart.setSubtotal(subtotal);
-//            cart.setTotaltax((subtotal * 12) / 100);
-//            cart.updateCart();
-//        } else {
-            for (CartItems i : newCart.getItems()) {
-                subtotal += i.getSubtotal();
-            }
-            newCart.setSubtotal(subtotal);
-            newCart.setTotaltax((subtotal * 12) / 100);
-            //newCart.updateCart();
-        //}
+        for (CartItems i : newCart.getItems()) {
+            subtotal += i.getSubtotal();
+        }
+        newCart.setSubtotal(subtotal);
+        newCart.setTotaltax((subtotal * 12) / 100);
+        newCart.setTotalamount(newCart.getSubtotal()+newCart.getTotalamount());
     }
 }
