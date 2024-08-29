@@ -1,19 +1,32 @@
 package com.order;
 
+import com.annotations.*;
 
+import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.*;
 
+@Table(name="cart")
 public class Cart {
+    @Column(name="cart_id")
     public String cart_id;
+    @Column(name="cus_id")
     public Integer cus_id;
+    @Column(name="totaltax")
     public double totaltax;
+    @Column(name="shipping_method")
     public String shipping_method;
+    @Column(name="shipping_charge")
     public double shipping_charge;
+    @Column(name="payment_mode")
     public String payment_mode;
+    @Column(name="service_charge")
     public double service_charge;
+    @Column(name="totalamount")
     public double totalamount;
+    @Column(name="subtotal")
     public double subtotal;
+
     public List<CartItems> items;
 
     public Cart(String cart_id, Integer cus_id, double totaltax, String shipping_method, double shipping_charge, String payment_mode, double service_charge, double totalamount, double subtotal, List<CartItems> items) {
@@ -111,44 +124,39 @@ public class Cart {
 
     public void compareCart(Cart oldCart) throws SQLException, ClassNotFoundException {
         if (oldCart != null && oldCart.getCart_id().equals(this.getCart_id())) {
-            List<String> query = new ArrayList<>();
-            List<Object> param = new ArrayList<>();
-            if (!this.getCus_id().equals(oldCart.getCus_id())) {
-                query.add("cus_id=?");
-                param.add(this.getCus_id());
+            List<String> queryParts = new ArrayList<>();
+            List<Object> parameters = new ArrayList<>();
+            Class<?> clazz = this.getClass();
+            for (Field field : clazz.getDeclaredFields()) {
+                if (field.isAnnotationPresent(Column.class)) {
+                    Column column = field.getAnnotation(Column.class);
+                    field.setAccessible(true);
+                    try {
+                        Object newValue = field.get(this);
+                        Object oldValue = field.get(oldCart);
+                        System.out.println(column.name()+" "+oldValue+" "+newValue);
+                        if (oldValue == null) {
+                            if (newValue != null) {
+                                System.out.println(column.name());
+                                queryParts.add(column.name() + "=?");
+                                parameters.add(newValue);
+                            }
+                        } else if (!oldValue.equals(newValue)) {
+                            System.out.println(column.name());
+                            queryParts.add(column.name() + "=?");
+                            parameters.add(newValue);
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-            if (!this.getShipping_method().equals(oldCart.getShipping_method())) {
-                query.add("shipping_method=?");
-                param.add(this.getShipping_method());
-            }
-            if (this.getShipping_charge() != oldCart.getShipping_charge()) {
-                query.add("shipping_charge=?");
-                param.add(this.getShipping_charge());
-            }
-            if (!this.getPayment_mode().equals(oldCart.getPayment_mode())) {
-                query.add("payment_mode=?");
-                param.add(this.getPayment_mode());
-            }
-            if (this.getService_charge() != oldCart.getService_charge()) {
-                query.add("service_charge=?");
-                param.add(this.getService_charge());
-            }
-            if (this.getSubtotal() != oldCart.getSubtotal()) {
-                query.add("subtotal=?");
-                param.add(this.getSubtotal());
-            }
-            if (this.getTotaltax() != oldCart.getTotaltax()) {
-                query.add("totaltax=?");
-                param.add(this.getTotaltax());
-            }
-            if (this.getTotalamount() != oldCart.getTotalamount()) {
-                query.add("totalamount=?");
-                param.add(this.getTotalamount());
-            }
-            if (!query.isEmpty()) {
-                String q = "UPDATE cart SET " + String.join(",", query) + " WHERE cart_id=?";
-                param.add(this.getCart_id());
-                persist(q, param.toArray());
+            if (!queryParts.isEmpty()) {
+                String query = "UPDATE cart SET " + String.join(", ", queryParts) + " WHERE cart_id=?";
+                parameters.add(this.getCart_id());
+                System.out.println("Generated SQL Query: " + query);
+                System.out.println("Parameters: " + parameters);
+                persist(query, parameters.toArray());
             }
         }
     }
