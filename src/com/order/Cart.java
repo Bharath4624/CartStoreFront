@@ -126,8 +126,8 @@ public class Cart {
         if (oldCart != null && oldCart.getCart_id().equals(this.getCart_id())) {
             List<String> queryParts = new ArrayList<>();
             List<Object> parameters = new ArrayList<>();
-            Class<?> clazz = this.getClass();
-            for (Field field : clazz.getDeclaredFields()) {
+            Class<?> c = this.getClass();
+            for (Field field : c.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Column.class)) {
                     Column column = field.getAnnotation(Column.class);
                     field.setAccessible(true);
