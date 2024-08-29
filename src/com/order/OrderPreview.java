@@ -11,7 +11,6 @@ import java.util.ArrayList;
 @WebServlet("/cart/preview")
 public class OrderPreview extends HttpServlet {
     public Cart cart;
-    public static Customer customer = AddCustomer.customer;
 
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
@@ -46,7 +45,7 @@ public class OrderPreview extends HttpServlet {
         return itemsArray;
     }
 
-    public JsonObject getSummary() throws SQLException, ClassNotFoundException {
+    public JsonObject getSummary() {
         JsonObject response = new JsonObject();
         response.addProperty("shipping method", cart.getShipping_method());
         response.addProperty("shipping_charge", cart.getShipping_charge());
@@ -55,9 +54,6 @@ public class OrderPreview extends HttpServlet {
         response.addProperty("subtotal", cart.getSubtotal());
         response.addProperty("totaltax", cart.getTotaltax());
         response.addProperty("totalamount", cart.getTotalamount());
-        if (cart.getCus_id() != 0) {
-            updateCart();
-        }
         return response;
     }
 
@@ -79,10 +75,6 @@ public class OrderPreview extends HttpServlet {
             }
         }
         return response;
-    }
-
-    public void updateCart() throws SQLException, ClassNotFoundException {
-        cart.updateCart();
     }
 
     public Cart getCart(String cart_id) throws SQLException, ClassNotFoundException {
