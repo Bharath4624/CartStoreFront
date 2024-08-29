@@ -112,17 +112,17 @@ public class Order {
         }
     }
 
-    public static void executeQuery(Order order) throws SQLException, ClassNotFoundException {
+    public void executeQuery() throws SQLException, ClassNotFoundException {
         Connection con = DatabaseConnection.getConnection();
         PreparedStatement stmt = con.prepareStatement("INSERT INTO orders(cus_id,shipping_method,shipping_charge,payment_mode,service_charge,totaltax,totalamount,subtotal)VALUES(?,?,?,?,?,?,?,?)");
-        stmt.setObject(1, order.getCus_id());
-        stmt.setObject(2, order.getShipping_method());
-        stmt.setObject(3, order.getShipping_charge());
-        stmt.setObject(4, order.getPayment_mode());
-        stmt.setObject(5, order.getService_charge());
-        stmt.setObject(6, order.getTotaltax());
-        stmt.setObject(7, order.getTotalamount());
-        stmt.setObject(8, order.getSubtotal());
+        stmt.setObject(1, this.getCus_id());
+        stmt.setObject(2, this.getShipping_method());
+        stmt.setObject(3, this.getShipping_charge());
+        stmt.setObject(4, this.getPayment_mode());
+        stmt.setObject(5, this.getService_charge());
+        stmt.setObject(6, this.getTotaltax());
+        stmt.setObject(7, this.getTotalamount());
+        stmt.setObject(8, this.getSubtotal());
         stmt.executeUpdate();
     }
 }

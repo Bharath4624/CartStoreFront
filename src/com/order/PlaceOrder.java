@@ -46,7 +46,7 @@ public class PlaceOrder extends HttpServlet {
     public int[] insertIntoOrder(Cart cart) throws SQLException, ClassNotFoundException {
         int[] details = new int[2];
         order = new Order(cart.getCus_id(), "", cart.getShipping_method(), cart.getShipping_charge(), cart.getPayment_mode(), cart.getService_charge(), cart.getTotaltax(), cart.getTotalamount(), cart.getSubtotal());
-        Order.executeQuery(order);
+        order.executeQuery();
         String query1 = "SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1";
         ResultSet generatedKeys = Order.persist(query1, new Object[]{});
         if (generatedKeys.next()) {
