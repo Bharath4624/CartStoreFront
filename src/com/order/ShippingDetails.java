@@ -24,7 +24,7 @@ public class ShippingDetails extends HttpServlet {
             String shipping_method = jsonObject.get("method").getAsString();
             String cart_id = CartId.getCartId(req);
             cart = getCart(cart_id);
-            newCart=getCart(cart_id);
+            newCart = getCart(cart_id);
             addCharges();
             double shipping_charge = getCharge(shipping_method);
             double[] totals = calculateTotals(shipping_charge);
@@ -58,7 +58,7 @@ public class ShippingDetails extends HttpServlet {
         return new double[]{totalamount, newCart.getSubtotal(), totaltax};
     }
 
-    public void updateCart(String shipping_method, double shipping_charge, double[] totals) throws SQLException, ClassNotFoundException {
+    public void updateCart(String shipping_method, double shipping_charge, double[] totals) {
         newCart.setShipping_method(shipping_method);
         newCart.setShipping_charge(shipping_charge);
         newCart.setTotaltax(totals[2]);

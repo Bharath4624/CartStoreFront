@@ -14,10 +14,6 @@ public class CartItems {
         return prod_id;
     }
 
-    public void setProd_id(int prod_id) {
-        this.prod_id = prod_id;
-    }
-
     public String getName() {
         return name;
     }

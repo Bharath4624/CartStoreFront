@@ -136,6 +136,6 @@ public class AddToCart extends HttpServlet {
         }
         newCart.setSubtotal(subtotal);
         newCart.setTotaltax((subtotal * 12) / 100);
-        newCart.setTotalamount(newCart.getSubtotal()+newCart.getTotaltax());
+        newCart.setTotalamount(newCart.getSubtotal() + newCart.getTotaltax());
     }
 }
