@@ -127,6 +127,7 @@ public class Cart {
             List<String> query = new ArrayList<>();
             List<Object> param = new ArrayList<>();
             Class<?> c = this.getClass();
+            Table table = c.getAnnotation(Table.class);
             for (Field field : c.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Column.class)) {
                     Column column = field.getAnnotation(Column.class);
@@ -141,7 +142,7 @@ public class Cart {
                 }
             }
             if (!query.isEmpty()) {
-                String q = "UPDATE cart SET " + String.join(", ", query) + " WHERE cart_id=?";
+                String q = "UPDATE " + table.name() + " SET " + String.join(", ", query) + " WHERE cart_id=?";
                 param.add(this.getCart_id());
                 System.out.println("Query:" + q);
                 System.out.println("Parameters:" + param);
