@@ -13,7 +13,7 @@ public class AddCustomer extends HttpServlet {
     public Gson gson = new Gson();
     public Cart cart;
     public Cart newCart;
-    public static Customer customer;
+    public Customer customer;
 
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json");
