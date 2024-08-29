@@ -147,7 +147,7 @@ public class Cart {
             if (!query.isEmpty()) {
                 String q = "UPDATE cart SET " + String.join(", ", query) + " WHERE cart_id=?";
                 param.add(this.getCart_id());
-                System.out.println("Generated SQL Query:" + q);
+                System.out.println("Query:" + q);
                 System.out.println("Parameters:" + param);
                 persist(q, param.toArray());
             }
