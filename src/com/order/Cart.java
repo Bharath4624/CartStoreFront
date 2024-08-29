@@ -139,7 +139,7 @@ public class Cart {
                             queryParts.add(column.name() + "=?");
                             parameters.add(newValue);
                         }
-                    } catch (IllegalAccessException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
