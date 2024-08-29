@@ -124,8 +124,8 @@ public class Cart {
 
     public void compareCart(Cart oldCart) throws SQLException, ClassNotFoundException {
         if (oldCart != null && oldCart.getCart_id().equals(this.getCart_id())) {
-            List<String> queryParts = new ArrayList<>();
-            List<Object> parameters = new ArrayList<>();
+            List<String> query = new ArrayList<>();
+            List<Object> param = new ArrayList<>();
             Class<?> c = this.getClass();
             for (Field field : c.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Column.class)) {
@@ -136,20 +136,20 @@ public class Cart {
                         Object oldValue = field.get(oldCart);
                         if (!oldValue.equals(newValue)) {
                             System.out.println(column.name() + " " + oldValue + " " + newValue);
-                            queryParts.add(column.name() + "=?");
-                            parameters.add(newValue);
+                            query.add(column.name() + "=?");
+                            param.add(newValue);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
-            if (!queryParts.isEmpty()) {
-                String query = "UPDATE cart SET " + String.join(", ", queryParts) + " WHERE cart_id=?";
-                parameters.add(this.getCart_id());
-                System.out.println("Generated SQL Query:" + query);
-                System.out.println("Parameters:" + parameters);
-                persist(query, parameters.toArray());
+            if (!query.isEmpty()) {
+                String q = "UPDATE cart SET " + String.join(", ", query) + " WHERE cart_id=?";
+                param.add(this.getCart_id());
+                System.out.println("Generated SQL Query:" + q);
+                System.out.println("Parameters:" + param);
+                persist(q, param.toArray());
             }
         }
     }
