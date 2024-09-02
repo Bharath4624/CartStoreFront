@@ -70,7 +70,7 @@ public class EditCart extends HttpServlet {
             if (item.getProd_id() == prod_id) {
                 double price = item.getSubtotal() / item.getQuantity();
                 item.setQuantity(item.getQuantity() - 1);
-                if (item.getQuantity() <= 0) {
+                if (item.getQuantity() < 1) {
                     cart.deleteItems(item);
                     cart.getItems().remove(item);
                 } else {
